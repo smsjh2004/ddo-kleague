@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "K리그 직관일지",
+    "slug": "kleague-diary-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "kleaguediary",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#001C48"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kleaguediary.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "직관 사진을 일지에 첨부하기 위해 사진 라이브러리 접근 권한이 필요합니다.",
+        "NSCameraUsageDescription": "직관 현장 사진을 촬영해 일지에 첨부하기 위해 카메라 접근 권한이 필요합니다."
+      }
+    },
+    "android": {
+      "package": "com.kleaguediary.app",
+      "backgroundColor": "#ffffff",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#001C48"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "직관 사진을 일지에 첨부하기 위해 사진 라이브러리 접근 권한이 필요합니다.",
+          "cameraPermission": "직관 현장 사진을 촬영해 일지에 첨부하기 위해 카메라 접근 권한이 필요합니다."
+        }
+      ]
+    ]
+  }
+}
