@@ -11,6 +11,7 @@ WebBrowser.maybeCompleteAuthSession();
 const FOREGROUND_GRACE_MS = 4000;
 // Hard ceiling so a stuck login can never hang the button forever.
 const MAX_WAIT_MS = 120000;
+const NATIVE_REDIRECT_URL = 'kleaguediary://auth-callback';
 
 // Resolves with the deep-link URL, or null once the user has clearly given up.
 // The clock only runs while our app is in front: if we're backgrounded the
@@ -58,17 +59,13 @@ export async function signInWithKakao() {
   // has to land back on a path this single-page app actually serves, so it
   // just goes back to the site root - supabase-js auto-detects the session
   // tokens in the URL hash on load there (detectSessionInUrl, on by default).
-  const redirectTo = Platform.OS === 'web' ? window.location.origin : Linking.createURL('auth-callback');
+  const redirectTo = Platform.OS === 'web' ? window.location.origin : NATIVE_REDIRECT_URL;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'kakao',
     options: {
       redirectTo,
       skipBrowserRedirect: true,
-      // Only request the consent items actually enabled in the Kakao app
-      // (동의항목) - excluding account_email avoids needing Kakao business
-      // verification, since the app only needs nickname/profile photo.
-      scopes: 'profile_nickname profile_image',
     },
   });
   if (error) throw error;
@@ -84,23 +81,26 @@ export async function signInWithKakao() {
   // tokens are still in flight. Listen for the deep link ourselves and, on a
   // dismiss, give that link a moment to land before treating it as a failure.
   let deepLinkUrl = null;
+  let deepLinkSubscription = null;
   const isAuthCallback = (url) => url.includes('auth-callback') || url.startsWith(redirectTo);
   const deepLinkPromise = new Promise((resolve) => {
-    const subscription = Linking.addEventListener('url', ({ url }) => {
+    deepLinkSubscription = Linking.addEventListener('url', ({ url }) => {
       if (isAuthCallback(url)) {
         deepLinkUrl = url;
-        subscription.remove();
         resolve(url);
       }
     });
   });
 
-  const result = await Promise.race([
-    WebBrowser.openAuthSessionAsync(data.url, redirectTo),
-    deepLinkPromise.then((url) => ({ type: 'success', url })),
-  ]);
+  let result;
+  let finalUrl;
+  try {
+    result = await Promise.race([
+      WebBrowser.openAuthSessionAsync(data.url, redirectTo),
+      deepLinkPromise.then((url) => ({ type: 'success', url })),
+    ]);
 
-  let finalUrl = result.type === 'success' ? result.url : deepLinkUrl;
+    finalUrl = result.type === 'success' ? result.url : deepLinkUrl;
 
   // A "dismiss" only means the app came to the foreground, which also happens
   // mid-login whenever the browser hands off (Kakao's 간편로그인 bounces
@@ -108,12 +108,11 @@ export async function signInWithKakao() {
   // Treat it as a real cancel only once the app has actually stayed in front
   // with no deep link; while we're still backgrounded the browser is up and
   // the user is mid-flow, so keep waiting.
-  if (!finalUrl) finalUrl = await waitForDeepLink(deepLinkPromise);
-
-  if (!finalUrl) {
-    const initialUrl = await Linking.getInitialURL();
-    if (initialUrl && isAuthCallback(initialUrl)) finalUrl = initialUrl;
+    if (!finalUrl) finalUrl = await waitForDeepLink(deepLinkPromise);
+  } finally {
+    deepLinkSubscription?.remove();
   }
+
   if (!finalUrl) {
     throw new Error(`로그인이 완료되지 않았습니다 (${result.type})`);
   }
