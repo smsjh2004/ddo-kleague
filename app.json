@@ -28,7 +28,7 @@
       "backgroundColor": "#ffffff",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#031024"
+        "backgroundColor": "#0e0f22"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
