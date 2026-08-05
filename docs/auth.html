@@ -1,0 +1,77 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>또직관 로그인</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px;
+    text-align: center;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  p { margin: 0; font-size: 15px; font-weight: 600; }
+  .muted { color: #666; font-size: 13px; font-weight: 500; }
+  a.btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: #001C48;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #031024; color: #f1f5f9; }
+    .muted { color: #94a3b8; }
+    a.btn { background: #EE3224; }
+  }
+</style>
+
+<p id="status">로그인 처리 중…</p>
+<a class="btn" id="open" href="#">앱으로 돌아가기</a>
+<p class="muted" id="hint"></p>
+
+<script>
+  // OAuth bridge.
+  //
+  // Supabase used to redirect straight to kleaguediary://auth-callback, but a
+  // browser is free to ignore a redirect into a custom scheme - and several do
+  // once the flow has bounced out to the KakaoTalk app and back, which is why
+  // login worked in some browsers and silently died in others.
+  //
+  // An https destination is always followed, so the tokens reliably land here.
+  // From this page we hop to the app ourselves, and if the browser blocks that
+  // too there is a button: a tap is a user gesture, which browsers do honour.
+  var APP_URL = 'kleaguediary://auth-callback';
+
+  // Implicit flow puts the tokens in the fragment, PKCE puts ?code= in the
+  // query - forward whichever one showed up, untouched.
+  var payload = window.location.hash || window.location.search || '';
+  var target = APP_URL + payload;
+
+  document.getElementById('open').setAttribute('href', target);
+
+  try {
+    window.location.replace(target);
+  } catch (e) {
+    // Ignored: the button below is the fallback.
+  }
+
+  // If we're still here a moment later the automatic hop didn't take.
+  setTimeout(function () {
+    document.getElementById('status').textContent = '앱으로 돌아가 로그인을 완료해주세요.';
+    if (!payload) {
+      document.getElementById('hint').textContent =
+        '로그인 정보가 전달되지 않았습니다. 앱에서 다시 시도해주세요.';
+    }
+  }, 1200);
+</script>

@@ -32,7 +32,7 @@ import {
   setLogGoodsLinks,
   listFriends,
 } from './utils/api';
-import { signOut } from './utils/auth';
+import { signOut, consumeAuthCallbackUrl } from './utils/auth';
 import { getAchievements } from './utils/achievements';
 import { showAchievementUnlock } from './utils/achievementAlert';
 import { initAds } from './utils/ads';
@@ -198,6 +198,21 @@ export default function App() {
       setIsWriting(true);
     }
   }, [writeAutofill, activeTab]);
+
+  // OAuth callback deep link. signInWithKakao() normally consumes this itself,
+  // but "카카오톡으로 로그인" leaves through the KakaoTalk app, and Android is
+  // free to kill us while we sit in the background - the redirect then cold
+  // starts the app, with no pending sign-in call left to receive the tokens.
+  // Handling it here means the session lands no matter which path ran, and
+  // onAuthStateChange picks it up from there.
+  useEffect(() => {
+    const handleAuthUrl = (url) => {
+      consumeAuthCallbackUrl(url).catch(() => {});
+    };
+    Linking.getInitialURL().then(handleAuthUrl).catch(() => {});
+    const sub = Linking.addEventListener('url', ({ url }) => handleAuthUrl(url));
+    return () => sub.remove();
+  }, []);
 
   // Friend invite deep link: kleaguediary://friend/CODE (native) or
   // ?friend=CODE (web). Jumps to My Page and hands the code down so the

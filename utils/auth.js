@@ -11,7 +11,40 @@ WebBrowser.maybeCompleteAuthSession();
 const FOREGROUND_GRACE_MS = 4000;
 // Hard ceiling so a stuck login can never hang the button forever.
 const MAX_WAIT_MS = 120000;
+// Where the app itself is reachable - this is what actually comes back as a
+// deep link, so it stays the URL the browser session watches for.
 const NATIVE_REDIRECT_URL = 'kleaguediary://auth-callback';
+
+// Where Supabase is told to send the browser. Handing a custom scheme straight
+// to the browser is unreliable: some refuse to follow a redirect into one,
+// especially after the flow has bounced out to the KakaoTalk app and back, and
+// then the tokens never reach us at all. An https page is always followed, and
+// docs/auth.html forwards from there to NATIVE_REDIRECT_URL - with a button if
+// the browser blocks even that, since a tap is a user gesture.
+// Must be listed under Supabase Auth -> URL Configuration -> Redirect URLs.
+const BRIDGE_REDIRECT_URL = 'https://smsjh2004.github.io/ddo-kleague/auth.html';
+
+export function isAuthCallbackUrl(url) {
+  return typeof url === 'string' && url.includes('auth-callback');
+}
+
+// Turns an OAuth redirect URL into a live session. Safe to call with anything:
+// non-callback URLs and callbacks with no tokens are ignored, and re-applying
+// a session we already hold is a no-op. Returns the session, or null.
+export async function consumeAuthCallbackUrl(url) {
+  if (!supabase || !isAuthCallbackUrl(url)) return null;
+
+  const { params, errorCode } = QueryParams.getQueryParams(url);
+  if (errorCode) throw new Error(`${errorCode}: ${params.error_description || ''}`);
+  if (!params.access_token || !params.refresh_token) return null;
+
+  const { data, error } = await supabase.auth.setSession({
+    access_token: params.access_token,
+    refresh_token: params.refresh_token,
+  });
+  if (error) throw error;
+  return data.session;
+}
 
 // Resolves with the deep-link URL, or null once the user has clearly given up.
 // The clock only runs while our app is in front: if we're backgrounded the
@@ -54,12 +87,14 @@ export async function signInWithKakao() {
     throw new Error('Supabase가 아직 설정되지 않았습니다. constants/supabaseConfig.js를 확인해주세요.');
   }
 
-  // Native uses a custom-scheme deep link (kleaguediary://auth-callback) that
-  // WebBrowser.openAuthSessionAsync captures and we parse manually below. Web
-  // has to land back on a path this single-page app actually serves, so it
-  // just goes back to the site root - supabase-js auto-detects the session
-  // tokens in the URL hash on load there (detectSessionInUrl, on by default).
-  const redirectTo = Platform.OS === 'web' ? window.location.origin : NATIVE_REDIRECT_URL;
+  // Two different URLs on native: Supabase sends the browser to the https
+  // bridge, and the bridge hands off to the app scheme - so that scheme is
+  // what we watch for coming back. Web has no scheme to hop to and just lands
+  // back on the site root, where supabase-js picks the tokens out of the URL
+  // hash itself (detectSessionInUrl, on by default).
+  const isWeb = Platform.OS === 'web';
+  const redirectTo = isWeb ? window.location.origin : BRIDGE_REDIRECT_URL;
+  const returnUrl = isWeb ? window.location.origin : NATIVE_REDIRECT_URL;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'kakao',
@@ -82,10 +117,9 @@ export async function signInWithKakao() {
   // dismiss, give that link a moment to land before treating it as a failure.
   let deepLinkUrl = null;
   let deepLinkSubscription = null;
-  const isAuthCallback = (url) => url.includes('auth-callback') || url.startsWith(redirectTo);
   const deepLinkPromise = new Promise((resolve) => {
     deepLinkSubscription = Linking.addEventListener('url', ({ url }) => {
-      if (isAuthCallback(url)) {
+      if (isAuthCallbackUrl(url) || url.startsWith(returnUrl)) {
         deepLinkUrl = url;
         resolve(url);
       }
@@ -96,7 +130,7 @@ export async function signInWithKakao() {
   let finalUrl;
   try {
     result = await Promise.race([
-      WebBrowser.openAuthSessionAsync(data.url, redirectTo),
+      WebBrowser.openAuthSessionAsync(data.url, returnUrl),
       deepLinkPromise.then((url) => ({ type: 'success', url })),
     ]);
 
@@ -113,23 +147,17 @@ export async function signInWithKakao() {
     deepLinkSubscription?.remove();
   }
 
+  // App.js watches the same deep link and may well have applied it already -
+  // in that case there is a session even though we never saw the URL.
   if (!finalUrl) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) return session;
     throw new Error(`로그인이 완료되지 않았습니다 (${result.type})`);
   }
 
-  const { params, errorCode } = QueryParams.getQueryParams(finalUrl);
-  if (errorCode) throw new Error(`${errorCode}: ${params.error_description || ''}`);
-  if (!params.access_token || !params.refresh_token) {
-    throw new Error('로그인 응답에서 세션 정보를 찾을 수 없습니다.');
-  }
-
-  const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-    access_token: params.access_token,
-    refresh_token: params.refresh_token,
-  });
-  if (sessionError) throw sessionError;
-
-  return sessionData.session;
+  const session = await consumeAuthCallbackUrl(finalUrl);
+  if (!session) throw new Error('로그인 응답에서 세션 정보를 찾을 수 없습니다.');
+  return session;
 }
 
 export async function signOut() {
