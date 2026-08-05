@@ -10,9 +10,9 @@ import {
   StyleSheet,
   ActivityIndicator,
   Share,
-  Linking,
   Platform,
 } from 'react-native';
+import * as Linking from 'expo-linking';
 import * as Clipboard from 'expo-clipboard';
 import { Colors } from '../constants/Colors';
 import { sectionLabelBase } from '../constants/sharedStyles';
@@ -244,10 +244,10 @@ export default function FriendsScreen({
       showAlert('로그인 필요', '친구 기능은 로그인 후 이용할 수 있어요.');
       return;
     }
-    const link = Platform.OS === 'web' && typeof window !== 'undefined'
-      ? `${window.location.origin}?friend=${myCode}`
-      : Linking.createURL(`friend/${myCode}`);
     try {
+      const link = Platform.OS === 'web' && typeof window !== 'undefined'
+        ? `${window.location.origin}?friend=${myCode}`
+        : Linking.createURL(`friend/${myCode}`);
       await Share.share({ message: `또직관에서 친구 추가하기!\n${link}` });
     } catch (e) {
       showAlert('공유하기 실패', '잠시 후 다시 시도해주세요.');

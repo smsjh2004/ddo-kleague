@@ -4,14 +4,18 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Dimensions,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { CalendarPreview, DiaryPreview, MyPagePreview } from '../components/TutorialPreview';
 
 const { width } = Dimensions.get('window');
 
+// `preview` renders a miniature of the screen being described; pages without
+// one (welcome, finish) fall back to the emoji.
 const PAGES = [
   {
     emoji: '⚽',
@@ -20,7 +24,7 @@ const PAGES = [
     bullets: [],
   },
   {
-    emoji: '📅',
+    preview: CalendarPreview,
     title: '경기 일정을 한눈에',
     desc: 'K1·K2·코리아컵 전체 일정을 캘린더로 확인하고,\n내 팀 경기만 모아볼 수 있어요.',
     bullets: [
@@ -29,7 +33,7 @@ const PAGES = [
     ],
   },
   {
-    emoji: '📝',
+    preview: DiaryPreview,
     title: '직관일지 작성하기',
     desc: '직관한 경기의 순간을 사진과 함께 기록하고\n평점, 소감, 심판 판정까지 남겨보세요.',
     bullets: [
@@ -39,7 +43,7 @@ const PAGES = [
     ],
   },
   {
-    emoji: '🏆',
+    preview: MyPagePreview,
     title: '마이페이지에서 더 즐기기',
     desc: '기록이 쌓일수록 마이페이지가 풍성해져요.',
     bullets: [
@@ -75,8 +79,18 @@ export default function TutorialScreen({ theme = 'light', onFinish }) {
         )}
       </View>
 
-      <View style={[styles.page, { width, flex: 1, justifyContent: 'center' }]}>
-        <Text style={styles.pageEmoji}>{page.emoji}</Text>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.page, { width, flexGrow: 1, justifyContent: 'center' }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {page.preview ? (
+          <View style={styles.previewWrap}>
+            <page.preview theme={theme} />
+          </View>
+        ) : (
+          <Text style={styles.pageEmoji}>{page.emoji}</Text>
+        )}
         <Text style={[styles.pageTitle, { color: isDark ? '#ffffff' : activeColors.brandNavy }]}>
           {page.title}
         </Text>
@@ -91,7 +105,7 @@ export default function TutorialScreen({ theme = 'light', onFinish }) {
             ))}
           </View>
         )}
-      </View>
+      </ScrollView>
 
       <View style={styles.dotsRow}>
         {PAGES.map((_, i) => (
@@ -138,6 +152,9 @@ const styles = StyleSheet.create({
   },
   pageEmoji: {
     fontSize: 64,
+    marginBottom: 24,
+  },
+  previewWrap: {
     marginBottom: 24,
   },
   pageTitle: {
