@@ -52,7 +52,13 @@
           "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
       ],
-      "./plugins/withKotlinSkipMetadataCheck.js"
+      "./plugins/withKotlinSkipMetadataCheck.js",
+      [
+        "@react-native-seoul/kakao-login",
+        {
+          "kakaoAppKey": "f4e8d06eafa882b1de57a57c7766c5f6"
+        }
+      ]
     ],
     "owner": "saminyong",
     "extra": {
