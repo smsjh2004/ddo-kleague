@@ -15,7 +15,10 @@ import {
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { Colors } from '../constants/Colors';
 import { getTodayString } from '../utils/date';
+import { formatWon, formatWonShort } from '../utils/format';
+import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
 import { showAlert } from '../utils/appAlert';
+import AdBanner from '../components/AdBanner';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -25,12 +28,14 @@ const getCategories = (isDark) => ({
   food: { label: '식음료', color: '#EE3224' },
   transport: { label: '교통', color: '#64748B' },
   goods: { label: '굿즈', color: '#FBC02D' },
+  etc: { label: '기타', color: '#94A3B8' },
 });
 
 export default function WalletScreen({
   theme = 'light',
   expenses = [],
   logs = [],
+  isAdFree = false,
   onSaveExpense,
   onDeleteExpense,
 }) {
@@ -59,36 +64,8 @@ export default function WalletScreen({
   const activeColors = Colors[theme];
   const CATEGORIES = getCategories(theme === 'dark');
 
-  const expenseTranslateY = React.useRef(new Animated.Value(0)).current;
-  const expensePanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          expenseTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setFormVisible(false);
-          setTimeout(() => {
-            expenseTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(expenseTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
-
-  // Helper to format currency
-  const formatWon = (num) => {
-    return new Intl.NumberFormat('ko-KR').format(num) + '원';
-  };
+  const { translateY: expenseTranslateY, panResponder: expensePanResponder } =
+    useSwipeDismissModal(() => setFormVisible(false));
 
   // Month navigation
   const isAtMinMonth = currentYear === minYear && currentMonth === 1;
@@ -118,7 +95,7 @@ export default function WalletScreen({
   const avgSpentPerMatch = recordedMatchesCount > 0 ? Math.round(totalSpent / recordedMatchesCount) : 0;
 
   // Category sums
-  const catSums = { ticket: 0, food: 0, transport: 0, goods: 0 };
+  const catSums = { ticket: 0, food: 0, transport: 0, goods: 0, etc: 0 };
   expenses.forEach((item) => {
     if (catSums[item.category] !== undefined) {
       catSums[item.category] += parseInt(item.amount || 0);
@@ -140,12 +117,9 @@ export default function WalletScreen({
     }
   });
   const maxMonthlyExpense = Math.max(...monthlyExpenseData.map((d) => d.amount), 1);
-
-  const formatWonShort = (num) => {
-    if (num >= 10000) return `${Math.round(num / 10000)}`;
-    if (num >= 1000) return `${Math.round(num / 1000)}`;
-    return `${num}`;
-  };
+  // Top padding in the 120px chart canvas so the max-value point's circle
+  // (radius 4) doesn't get clipped by the SVG's top edge.
+  const CHART_TOP_PAD = 8;
 
   // Month-specific list filtering
   const visibleExpenses = expenses.filter((item) => {
@@ -166,7 +140,7 @@ export default function WalletScreen({
       setFormMemo(expense.memo || '');
     } else {
       setEditingExpense(null);
-      setFormMatchId(logs[0]?.id || '');
+      setFormMatchId('');
       setFormCategory('ticket');
       setFormAmount('');
       setFormMemo('');
@@ -296,8 +270,10 @@ export default function WalletScreen({
         </TouchableOpacity>
       </View>
 
+      <AdBanner hidden={isAdFree} />
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
+
         {/* SUB TAB 1: SUMMARY */}
         {activeSubTab === 'summary' && (
           <View style={styles.tabContent}>
@@ -401,7 +377,7 @@ export default function WalletScreen({
                             <Polyline
                               points={monthlyExpenseData.map((d, i) => {
                                 const x = (i + 0.5) * (chartPlotWidth / 12);
-                                const y = 120 - (maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * 120 : 0);
+                                const y = 120 - (maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * (120 - CHART_TOP_PAD) : 0);
                                 return `${x},${y}`;
                               }).join(' ')}
                               fill="none"
@@ -411,7 +387,7 @@ export default function WalletScreen({
                             {monthlyExpenseData.filter((d) => d.amount > 0).map((d) => {
                               const i = d.month - 1;
                               const x = (i + 0.5) * (chartPlotWidth / 12);
-                              const y = 120 - (maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * 120 : 0);
+                              const y = 120 - (maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * (120 - CHART_TOP_PAD) : 0);
                               const isCurrentMonth = d.month === currentMonthNum;
                               return (
                                 <Circle
@@ -428,7 +404,7 @@ export default function WalletScreen({
 
                         <View style={styles.mChartBarsRow}>
                           {monthlyExpenseData.map((d) => {
-                            const pointHeight = maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * 120 : 0;
+                            const pointHeight = maxMonthlyExpense > 0 ? (d.amount / maxMonthlyExpense) * (120 - CHART_TOP_PAD) : 0;
                             const hasAmount = d.amount > 0;
                             const isCurrentMonth = d.month === currentMonthNum;
                             return (
@@ -609,7 +585,7 @@ export default function WalletScreen({
 
             {/* Match Selection Dropdown Mock */}
             <View style={styles.formSection}>
-              <Text style={[styles.formLabel, { color: activeColors.textBody }]}>해당 경기 선택 (선택)</Text>
+              <Text style={[styles.formLabel, { color: activeColors.textBody }]}>관련 경기 (선택사항)</Text>
               {logs.length === 0 ? (
                 <View style={styles.noMatchesAlert}>
                   <Text style={{ color: activeColors.textMuted, fontSize: 11, fontWeight: '700' }}>
@@ -687,7 +663,7 @@ export default function WalletScreen({
                       <Text style={[
                         styles.chipText,
                         { color: activeColors.textBody },
-                        isActive && { color: cat.color, fontWeight: '950' }
+                        isActive && { color: cat.color, fontWeight: '900' }
                       ]}>
                         {cat.label}
                       </Text>
@@ -811,7 +787,7 @@ const styles = StyleSheet.create({
   balanceAmountText: {
     color: '#ffffff',
     fontSize: 24,
-    fontWeight: '950',
+    fontWeight: '900',
     marginVertical: 8,
   },
   balanceSubRow: {
@@ -975,7 +951,7 @@ const styles = StyleSheet.create({
   },
   monthlyTotalAmount: {
     fontSize: 20,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   emptyText: {
     fontSize: 12,
@@ -1076,7 +1052,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 16,
-    fontWeight: '950',
+    fontWeight: '900',
     alignSelf: 'center',
     marginBottom: 15,
   },

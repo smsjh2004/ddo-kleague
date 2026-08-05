@@ -51,6 +51,17 @@ export async function deleteProfileRemote(userId) {
   );
 }
 
+// Removes the auth.users row too, which the anon key can't touch - see
+// supabase/functions/delete-account. Everything else cascades off it, so this
+// alone is a full purge. Returns false if the call failed, letting the caller
+// fall back to deleting just the profile row.
+export async function deleteAccountRemote() {
+  const result = await safeCall('계정 삭제', () =>
+    supabase.functions.invoke('delete-account', { method: 'POST' })
+  );
+  return result?.ok === true;
+}
+
 export async function upsertProfile(deviceId, { nickname, myTeam, avatarUrl }) {
   return safeCall('프로필 저장', () =>
     supabase.from('profiles').upsert({
@@ -76,6 +87,7 @@ export async function upsertDiaryLog(deviceId, log) {
       stadium: log.stadium,
       rating: log.rating,
       photo_url: log.photo || null,
+      photo_urls: log.photos && log.photos.length > 0 ? log.photos : null,
       review: log.review || '',
       companion: log.companion || '혼관',
       companion_friend_ids: log.companionFriendIds && log.companionFriendIds.length > 0 ? log.companionFriendIds : null,
@@ -84,6 +96,33 @@ export async function upsertDiaryLog(deviceId, log) {
       updated_at: new Date().toISOString(),
     })
   );
+}
+
+// Raw rows come back snake_case - re-shape into the camelCase log objects
+// the rest of the client (DiaryListScreen, AnalysisScreen, achievements...)
+// already expects, matching exactly what DiaryWriteScreen builds on save.
+export async function listDiaryLogs(userId) {
+  const rows = await safeCall('직관일지 목록 조회', () =>
+    supabase.from('diary_logs').select('*').eq('user_id', userId).order('match_date', { ascending: false })
+  );
+  if (!rows) return null;
+  return rows.map((r) => ({
+    id: r.id,
+    homeTeam: r.home_team,
+    awayTeam: r.away_team,
+    homeScore: r.home_score,
+    awayScore: r.away_score,
+    date: r.match_date,
+    stadium: r.stadium,
+    rating: r.rating,
+    photos: r.photo_urls && r.photo_urls.length > 0 ? r.photo_urls : (r.photo_url ? [r.photo_url] : []),
+    photo: r.photo_url || (r.photo_urls && r.photo_urls[0]) || null,
+    review: r.review || '',
+    companion: r.companion || '혼관',
+    companionFriendIds: r.companion_friend_ids || [],
+    weather: r.weather || '☀️맑음',
+    refereeScore: r.referee_score,
+  }));
 }
 
 export async function deleteDiaryLogRemote(deviceId, logId) {
@@ -106,6 +145,23 @@ export async function upsertExpense(deviceId, expense) {
       goods_id: expense.goodsId || null,
     })
   );
+}
+
+export async function listExpenses(userId) {
+  const rows = await safeCall('지출 목록 조회', () =>
+    supabase.from('expenses').select('*').eq('user_id', userId).order('expense_date', { ascending: false })
+  );
+  if (!rows) return null;
+  return rows.map((r) => ({
+    id: r.id,
+    matchId: r.match_id,
+    matchTitle: r.match_title || '',
+    date: r.expense_date,
+    category: r.category,
+    amount: r.amount,
+    memo: r.memo || '',
+    goodsId: r.goods_id || null,
+  }));
 }
 
 export async function deleteExpenseRemote(deviceId, expenseId) {

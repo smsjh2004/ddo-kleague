@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { sectionLabelBase } from '../constants/sharedStyles';
 import { calculateOutcome } from '../utils/achievements';
 import { showAlert } from '../utils/appAlert';
 import { Ionicons } from '@expo/vector-icons';
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    fontWeight: '950',
+    fontWeight: '900',
     flex: 1,
   },
   categoryChip: {
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   winRateValue: {
     color: '#ffffff',
     fontSize: 30,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   winRateLabel: {
     color: 'rgba(255,255,255,0.7)',
@@ -211,8 +212,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sectionLabel: {
-    fontSize: 11.5,
-    fontWeight: '800',
+    ...sectionLabelBase,
     marginBottom: 10,
     marginLeft: 2,
   },

@@ -7,19 +7,19 @@
     "home": "전북 현대 모터스",
     "away": "부천 FC 1995",
     "stadium": "전주월드컵경기장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 2,
     "date": "2026-03-01",
     "time": "14:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "천안 시티 FC",
     "stadium": "용인 미르스타디움",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 3,
@@ -29,8 +29,8 @@
     "home": "대구 FC",
     "away": "화성 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 4,
@@ -40,8 +40,8 @@
     "home": "충북 청주 FC",
     "away": "수원 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 5,
@@ -51,8 +51,8 @@
     "home": "제주 SK FC",
     "away": "광주 FC",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 6,
@@ -62,8 +62,8 @@
     "home": "경남 FC",
     "away": "전남 드래곤즈",
     "stadium": "창원 축구센터",
-    "homeScore": 1,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 7,
@@ -73,8 +73,8 @@
     "home": "대전 하나 시티즌",
     "away": "FC 안양",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 8,
@@ -82,10 +82,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "충남아산 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "이순신 종합운동장",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 9,
@@ -95,8 +95,8 @@
     "home": "부산아이파크",
     "away": "성남 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 10,
@@ -106,19 +106,19 @@
     "home": "서울 이랜드 FC",
     "away": "경남 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 11,
     "date": "2026-03-07",
     "time": "14:00",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "파주 스타디움",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 12,
@@ -128,8 +128,8 @@
     "home": "광주 FC",
     "away": "인천 유나이티드 FC",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 13,
@@ -139,8 +139,8 @@
     "home": "부천 FC 1995",
     "away": "대전 하나 시티즌",
     "stadium": "부천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 14,
@@ -150,8 +150,8 @@
     "home": "대구 FC",
     "away": "전남 드래곤즈",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 4,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 15,
@@ -159,10 +159,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "수원 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "수원종합운동장",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 16,
@@ -172,8 +172,8 @@
     "home": "김천 상무 FC",
     "away": "전북 현대 모터스",
     "stadium": "김천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 17,
@@ -183,8 +183,8 @@
     "home": "안산 그리너스 FC",
     "away": "부산아이파크",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 18,
@@ -194,8 +194,8 @@
     "home": "성남 FC",
     "away": "충북 청주 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 19,
@@ -205,8 +205,8 @@
     "home": "FC 안양",
     "away": "제주 SK FC",
     "stadium": "안양 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 20,
@@ -216,8 +216,8 @@
     "home": "천안 시티 FC",
     "away": "김포 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 21,
@@ -225,10 +225,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "화성 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "화성종합경기타운",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 22,
@@ -238,19 +238,19 @@
     "home": "광주 FC",
     "away": "전북 현대 모터스",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 23,
     "date": "2026-03-14",
     "time": "14:00",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "수원 FC",
     "stadium": "김해 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 24,
@@ -260,8 +260,8 @@
     "home": "서울 이랜드 FC",
     "away": "부산아이파크",
     "stadium": "목동종합운동장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 25,
@@ -271,8 +271,8 @@
     "home": "수원삼성블루윙즈",
     "away": "전남 드래곤즈",
     "stadium": "수원월드컵경기장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 26,
@@ -282,19 +282,19 @@
     "home": "대전 하나 시티즌",
     "away": "김천 상무 FC",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 27,
     "date": "2026-03-14",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "김포 FC",
     "stadium": "용인 미르스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 28,
@@ -304,8 +304,8 @@
     "home": "경남 FC",
     "away": "충북 청주 FC",
     "stadium": "창원 축구센터",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 29,
@@ -315,8 +315,8 @@
     "home": "부천 FC 1995",
     "away": "울산 HD FC",
     "stadium": "부천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 30,
@@ -326,8 +326,8 @@
     "home": "제주 SK FC",
     "away": "FC 서울",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 31,
@@ -337,8 +337,8 @@
     "home": "충남아산 FC",
     "away": "대구 FC",
     "stadium": "이순신 종합운동장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 32,
@@ -346,10 +346,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "안산 그리너스 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 33,
@@ -359,8 +359,8 @@
     "home": "강원 FC",
     "away": "FC 안양",
     "stadium": "강릉하이원아레나",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 34,
@@ -370,8 +370,8 @@
     "home": "포항 스틸러스",
     "away": "인천 유나이티드 FC",
     "stadium": "포항스틸야드",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 35,
@@ -381,8 +381,8 @@
     "home": "화성 FC",
     "away": "천안 시티 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 36,
@@ -392,8 +392,8 @@
     "home": "김천 상무 FC",
     "away": "광주 FC",
     "stadium": "김천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 37,
@@ -403,8 +403,8 @@
     "home": "부천 FC 1995",
     "away": "강원 FC",
     "stadium": "부천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 38,
@@ -414,8 +414,8 @@
     "home": "인천 유나이티드 FC",
     "away": "대전 하나 시티즌",
     "stadium": "인천축구전용경기장",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 39,
@@ -425,8 +425,8 @@
     "home": "제주 SK FC",
     "away": "울산 HD FC",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 40,
@@ -436,8 +436,8 @@
     "home": "전북 현대 모터스",
     "away": "FC 안양",
     "stadium": "전주월드컵경기장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 41,
@@ -447,8 +447,8 @@
     "home": "포항 스틸러스",
     "away": "FC 서울",
     "stadium": "포항스틸야드",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 42,
@@ -458,8 +458,8 @@
     "home": "대전 하나 시티즌",
     "away": "전북 현대 모터스",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 43,
@@ -469,30 +469,30 @@
     "home": "성남 FC",
     "away": "충남아산 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 44,
     "date": "2026-03-21",
     "time": "14:00",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "전남 드래곤즈",
     "stadium": "파주 스타디움",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 45,
     "date": "2026-03-21",
     "time": "14:00",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "수원삼성블루윙즈",
     "stadium": "김해 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 46,
@@ -502,8 +502,8 @@
     "home": "천안 시티 FC",
     "away": "서울 이랜드 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 47,
@@ -513,8 +513,8 @@
     "home": "충북 청주 FC",
     "away": "안산 그리너스 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 48,
@@ -524,8 +524,8 @@
     "home": "FC 서울",
     "away": "광주 FC",
     "stadium": "서울월드컵경기장",
-    "homeScore": 5,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 49,
@@ -535,8 +535,8 @@
     "home": "울산 HD FC",
     "away": "김천 상무 FC",
     "stadium": "울산문수축구경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 50,
@@ -544,10 +544,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "화성 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 51,
@@ -557,8 +557,8 @@
     "home": "부산아이파크",
     "away": "대구 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 52,
@@ -568,8 +568,8 @@
     "home": "FC 안양",
     "away": "인천 유나이티드 FC",
     "stadium": "안양 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 53,
@@ -579,8 +579,8 @@
     "home": "강원 FC",
     "away": "제주 SK FC",
     "stadium": "강릉하이원아레나",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 54,
@@ -590,8 +590,8 @@
     "home": "포항 스틸러스",
     "away": "부천 FC 1995",
     "stadium": "포항스틸야드",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 55,
@@ -601,19 +601,19 @@
     "home": "경남 FC",
     "away": "김포 FC",
     "stadium": "창원 축구센터",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 56,
     "date": "2026-03-28",
     "time": "14:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "용인 미르스타디움",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 57,
@@ -623,8 +623,8 @@
     "home": "충남아산 FC",
     "away": "화성 FC",
     "stadium": "이순신 종합운동장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 58,
@@ -634,8 +634,8 @@
     "home": "포항 스틸러스",
     "away": "강원 FC",
     "stadium": "포항스틸야드",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 59,
@@ -645,8 +645,8 @@
     "home": "성남 FC",
     "away": "김포 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 60,
@@ -656,8 +656,8 @@
     "home": "천안 시티 FC",
     "away": "전남 드래곤즈",
     "stadium": "천안 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 61,
@@ -667,8 +667,8 @@
     "home": "안산 그리너스 FC",
     "away": "경남 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 62,
@@ -678,8 +678,8 @@
     "home": "충북 청주 FC",
     "away": "부산아이파크",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 63,
@@ -687,10 +687,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "수원 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "수원종합운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 64,
@@ -700,8 +700,8 @@
     "home": "대구 FC",
     "away": "서울 이랜드 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 65,
@@ -711,8 +711,8 @@
     "home": "제주 SK FC",
     "away": "부천 FC 1995",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 66,
@@ -722,19 +722,19 @@
     "home": "전북 현대 모터스",
     "away": "울산 HD FC",
     "stadium": "전주월드컵경기장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 67,
     "date": "2026-04-04",
     "time": "14:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "전남 드래곤즈",
     "stadium": "용인 미르스타디움",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 68,
@@ -744,8 +744,8 @@
     "home": "서울 이랜드 FC",
     "away": "수원 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 69,
@@ -755,8 +755,8 @@
     "home": "포항 스틸러스",
     "away": "대전 하나 시티즌",
     "stadium": "포항스틸야드",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 70,
@@ -766,8 +766,8 @@
     "home": "강원 FC",
     "away": "광주 FC",
     "stadium": "강릉하이원아레나",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 71,
@@ -777,8 +777,8 @@
     "home": "화성 FC",
     "away": "성남 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 72,
@@ -788,8 +788,8 @@
     "home": "경남 FC",
     "away": "부산아이파크",
     "stadium": "창원 축구센터",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 73,
@@ -799,8 +799,8 @@
     "home": "FC 안양",
     "away": "FC 서울",
     "stadium": "안양 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 74,
@@ -810,8 +810,8 @@
     "home": "대구 FC",
     "away": "김포 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 3,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 75,
@@ -821,8 +821,8 @@
     "home": "수원삼성블루윙즈",
     "away": "충북 청주 FC",
     "stadium": "수원월드컵경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 76,
@@ -832,19 +832,19 @@
     "home": "인천 유나이티드 FC",
     "away": "김천 상무 FC",
     "stadium": "인천축구전용경기장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 77,
     "date": "2026-04-05",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
-    "away": "김해시청 축구단",
+    "home": "파주 프런티어 FC",
+    "away": "김해 FC 2008",
     "stadium": "파주 스타디움",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 78,
@@ -854,8 +854,8 @@
     "home": "안산 그리너스 FC",
     "away": "충남아산 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 79,
@@ -865,8 +865,8 @@
     "home": "포항 스틸러스",
     "away": "제주 SK FC",
     "stadium": "포항스틸야드",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 80,
@@ -876,8 +876,8 @@
     "home": "FC 서울",
     "away": "전북 현대 모터스",
     "stadium": "서울월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 81,
@@ -885,10 +885,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "부산아이파크",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 82,
@@ -898,8 +898,8 @@
     "home": "수원 FC",
     "away": "대구 FC",
     "stadium": "수원종합운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 83,
@@ -909,8 +909,8 @@
     "home": "광주 FC",
     "away": "부천 FC 1995",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 84,
@@ -920,19 +920,19 @@
     "home": "인천 유나이티드 FC",
     "away": "울산 HD FC",
     "stadium": "인천축구전용경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 85,
     "date": "2026-04-11",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "서울 이랜드 FC",
     "stadium": "파주 스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 86,
@@ -942,8 +942,8 @@
     "home": "화성 FC",
     "away": "전남 드래곤즈",
     "stadium": "화성종합경기타운",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 87,
@@ -953,8 +953,8 @@
     "home": "대전 하나 시티즌",
     "away": "강원 FC",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 88,
@@ -964,8 +964,8 @@
     "home": "수원삼성블루윙즈",
     "away": "김포 FC",
     "stadium": "수원월드컵경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 89,
@@ -975,8 +975,8 @@
     "home": "천안 시티 FC",
     "away": "충북 청주 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 90,
@@ -986,8 +986,8 @@
     "home": "김천 상무 FC",
     "away": "FC 안양",
     "stadium": "김천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 91,
@@ -997,8 +997,8 @@
     "home": "성남 FC",
     "away": "안산 그리너스 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 92,
@@ -1006,10 +1006,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "충남아산 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "이순신 종합운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 93,
@@ -1019,8 +1019,8 @@
     "home": "울산 HD FC",
     "away": "FC 서울",
     "stadium": "울산문수축구경기장",
-    "homeScore": 1,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 94,
@@ -1030,8 +1030,8 @@
     "home": "강원 FC",
     "away": "전북 현대 모터스",
     "stadium": "강릉하이원아레나",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 95,
@@ -1041,8 +1041,8 @@
     "home": "FC 서울",
     "away": "대전 하나 시티즌",
     "stadium": "서울월드컵경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 96,
@@ -1052,8 +1052,8 @@
     "home": "부산아이파크",
     "away": "수원 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 97,
@@ -1063,8 +1063,8 @@
     "home": "경남 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "창원 축구센터",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 98,
@@ -1074,8 +1074,8 @@
     "home": "제주 SK FC",
     "away": "김천 상무 FC",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 99,
@@ -1085,8 +1085,8 @@
     "home": "부천 FC 1995",
     "away": "인천 유나이티드 FC",
     "stadium": "부천 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 100,
@@ -1096,8 +1096,8 @@
     "home": "대구 FC",
     "away": "천안 시티 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 101,
@@ -1105,10 +1105,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "충북 청주 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 102,
@@ -1118,8 +1118,8 @@
     "home": "울산 HD FC",
     "away": "광주 FC",
     "stadium": "울산문수축구경기장",
-    "homeScore": 5,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 103,
@@ -1129,8 +1129,8 @@
     "home": "안산 그리너스 FC",
     "away": "서울 이랜드 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 104,
@@ -1138,10 +1138,10 @@
     "time": "14:00",
     "league": "K2",
     "home": "성남 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 105,
@@ -1151,8 +1151,8 @@
     "home": "포항 스틸러스",
     "away": "FC 안양",
     "stadium": "포항스틸야드",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 106,
@@ -1162,8 +1162,8 @@
     "home": "화성 FC",
     "away": "김포 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 107,
@@ -1173,8 +1173,8 @@
     "home": "충남아산 FC",
     "away": "전남 드래곤즈",
     "stadium": "이순신 종합운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 108,
@@ -1184,8 +1184,8 @@
     "home": "김천 상무 FC",
     "away": "강원 FC",
     "stadium": "김천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 109,
@@ -1195,8 +1195,8 @@
     "home": "FC 서울",
     "away": "부천 FC 1995",
     "stadium": "서울월드컵경기장",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 110,
@@ -1206,8 +1206,8 @@
     "home": "전북 현대 모터스",
     "away": "인천 유나이티드 FC",
     "stadium": "전주월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 111,
@@ -1217,8 +1217,8 @@
     "home": "대전 하나 시티즌",
     "away": "제주 SK FC",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 112,
@@ -1228,8 +1228,8 @@
     "home": "FC 안양",
     "away": "울산 HD FC",
     "stadium": "안양 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 113,
@@ -1239,8 +1239,8 @@
     "home": "포항 스틸러스",
     "away": "광주 FC",
     "stadium": "포항스틸야드",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 114,
@@ -1250,8 +1250,8 @@
     "home": "강원 FC",
     "away": "FC 서울",
     "stadium": "강릉하이원아레나",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 115,
@@ -1261,19 +1261,19 @@
     "home": "수원삼성블루윙즈",
     "away": "부산아이파크",
     "stadium": "수원월드컵경기장",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 116,
     "date": "2026-04-25",
     "time": "14:00",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "경남 FC",
     "stadium": "파주 스타디움",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 117,
@@ -1283,8 +1283,8 @@
     "home": "인천 유나이티드 FC",
     "away": "제주 SK FC",
     "stadium": "인천축구전용경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 118,
@@ -1294,8 +1294,8 @@
     "home": "부천 FC 1995",
     "away": "김천 상무 FC",
     "stadium": "부천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 119,
@@ -1305,8 +1305,8 @@
     "home": "천안 시티 FC",
     "away": "성남 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 120,
@@ -1316,8 +1316,8 @@
     "home": "안산 그리너스 FC",
     "away": "전남 드래곤즈",
     "stadium": "안산 와~스타디움",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 121,
@@ -1327,8 +1327,8 @@
     "home": "전북 현대 모터스",
     "away": "포항 스틸러스",
     "stadium": "전주월드컵경기장",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 122,
@@ -1338,8 +1338,8 @@
     "home": "수원 FC",
     "away": "김포 FC",
     "stadium": "수원종합운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 123,
@@ -1349,8 +1349,8 @@
     "home": "서울 이랜드 FC",
     "away": "화성 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 124,
@@ -1360,8 +1360,8 @@
     "home": "광주 FC",
     "away": "FC 안양",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 2,
-    "awayScore": 5
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 125,
@@ -1371,8 +1371,8 @@
     "home": "울산 HD FC",
     "away": "대전 하나 시티즌",
     "stadium": "울산문수축구경기장",
-    "homeScore": 1,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 126,
@@ -1382,19 +1382,19 @@
     "home": "충북 청주 FC",
     "away": "충남아산 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 127,
     "date": "2026-04-26",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
-    "away": "김해시청 축구단",
+    "home": "용인 FC",
+    "away": "김해 FC 2008",
     "stadium": "용인 미르스타디움",
-    "homeScore": 4,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 128,
@@ -1404,8 +1404,8 @@
     "home": "FC 서울",
     "away": "김천 상무 FC",
     "stadium": "서울월드컵경기장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 129,
@@ -1415,8 +1415,8 @@
     "home": "울산 HD FC",
     "away": "포항 스틸러스",
     "stadium": "울산문수축구경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 130,
@@ -1426,8 +1426,8 @@
     "home": "인천 유나이티드 FC",
     "away": "강원 FC",
     "stadium": "인천축구전용경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 131,
@@ -1437,8 +1437,8 @@
     "home": "제주 SK FC",
     "away": "전북 현대 모터스",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 132,
@@ -1448,8 +1448,8 @@
     "home": "FC 안양",
     "away": "부천 FC 1995",
     "stadium": "안양 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 133,
@@ -1459,8 +1459,8 @@
     "home": "광주 FC",
     "away": "대전 하나 시티즌",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 5
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 134,
@@ -1470,8 +1470,8 @@
     "home": "대구 FC",
     "away": "경남 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 135,
@@ -1481,8 +1481,8 @@
     "home": "화성 FC",
     "away": "안산 그리너스 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 136,
@@ -1492,8 +1492,8 @@
     "home": "서울 이랜드 FC",
     "away": "김포 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 137,
@@ -1503,41 +1503,41 @@
     "home": "천안 시티 FC",
     "away": "충남아산 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 138,
     "date": "2026-05-03",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "충북 청주 FC",
     "stadium": "파주 스타디움",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 139,
     "date": "2026-05-03",
     "time": "16:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "부산아이파크",
     "stadium": "김해 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 140,
     "date": "2026-05-03",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "성남 FC",
     "stadium": "용인 미르스타디움",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 141,
@@ -1547,8 +1547,8 @@
     "home": "수원 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "수원종합운동장",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 142,
@@ -1558,8 +1558,8 @@
     "home": "전북 현대 모터스",
     "away": "광주 FC",
     "stadium": "전주월드컵경기장",
-    "homeScore": 4,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 143,
@@ -1569,8 +1569,8 @@
     "home": "부천 FC 1995",
     "away": "제주 SK FC",
     "stadium": "부천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 144,
@@ -1580,8 +1580,8 @@
     "home": "김천 상무 FC",
     "away": "울산 HD FC",
     "stadium": "김천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 145,
@@ -1591,8 +1591,8 @@
     "home": "대전 하나 시티즌",
     "away": "인천 유나이티드 FC",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 146,
@@ -1602,8 +1602,8 @@
     "home": "강원 FC",
     "away": "포항 스틸러스",
     "stadium": "강릉하이원아레나",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 147,
@@ -1613,8 +1613,8 @@
     "home": "FC 서울",
     "away": "FC 안양",
     "stadium": "서울월드컵경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 148,
@@ -1624,8 +1624,8 @@
     "home": "제주 SK FC",
     "away": "FC 서울",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 149,
@@ -1635,8 +1635,8 @@
     "home": "충남아산 FC",
     "away": "서울 이랜드 FC",
     "stadium": "이순신 종합운동장",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 150,
@@ -1646,8 +1646,8 @@
     "home": "화성 FC",
     "away": "수원 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 151,
@@ -1657,8 +1657,8 @@
     "home": "김천 상무 FC",
     "away": "인천 유나이티드 FC",
     "stadium": "김천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 152,
@@ -1668,8 +1668,8 @@
     "home": "광주 FC",
     "away": "강원 FC",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 153,
@@ -1679,8 +1679,8 @@
     "home": "수원삼성블루윙즈",
     "away": "대구 FC",
     "stadium": "수원월드컵경기장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 154,
@@ -1690,8 +1690,8 @@
     "home": "충북 청주 FC",
     "away": "김포 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 155,
@@ -1701,8 +1701,8 @@
     "home": "대전 하나 시티즌",
     "away": "포항 스틸러스",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 156,
@@ -1712,8 +1712,8 @@
     "home": "울산 HD FC",
     "away": "부천 FC 1995",
     "stadium": "울산문수축구경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 157,
@@ -1723,8 +1723,8 @@
     "home": "성남 FC",
     "away": "전남 드래곤즈",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 158,
@@ -1734,8 +1734,8 @@
     "home": "FC 안양",
     "away": "전북 현대 모터스",
     "stadium": "안양 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 159,
@@ -1743,10 +1743,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "안산 그리너스 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 160,
@@ -1756,8 +1756,8 @@
     "home": "부산아이파크",
     "away": "천안 시티 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 161,
@@ -1765,10 +1765,10 @@
     "time": "19:00",
     "league": "K2",
     "home": "경남 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "창원 축구센터",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 162,
@@ -1778,8 +1778,8 @@
     "home": "강원 FC",
     "away": "대전 하나 시티즌",
     "stadium": "강릉하이원아레나",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 163,
@@ -1789,8 +1789,8 @@
     "home": "광주 FC",
     "away": "FC 서울",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 164,
@@ -1800,8 +1800,8 @@
     "home": "인천 유나이티드 FC",
     "away": "포항 스틸러스",
     "stadium": "인천축구전용경기장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 165,
@@ -1811,8 +1811,8 @@
     "home": "울산 HD FC",
     "away": "제주 SK FC",
     "stadium": "울산문수축구경기장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 166,
@@ -1822,8 +1822,8 @@
     "home": "FC 안양",
     "away": "김천 상무 FC",
     "stadium": "안양 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 167,
@@ -1833,8 +1833,8 @@
     "home": "부천 FC 1995",
     "away": "전북 현대 모터스",
     "stadium": "부천 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 168,
@@ -1844,8 +1844,8 @@
     "home": "대전 하나 시티즌",
     "away": "FC 서울",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 169,
@@ -1853,10 +1853,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "서울 이랜드 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 170,
@@ -1866,8 +1866,8 @@
     "home": "전남 드래곤즈",
     "away": "충북 청주 FC",
     "stadium": "광양 전용 구장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 171,
@@ -1877,8 +1877,8 @@
     "home": "인천 유나이티드 FC",
     "away": "광주 FC",
     "stadium": "인천축구전용경기장",
-    "homeScore": 4,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 172,
@@ -1886,10 +1886,10 @@
     "time": "19:00",
     "league": "K2",
     "home": "천안 시티 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 173,
@@ -1899,8 +1899,8 @@
     "home": "안산 그리너스 FC",
     "away": "김포 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 174,
@@ -1910,8 +1910,8 @@
     "home": "제주 SK FC",
     "away": "FC 안양",
     "stadium": "제주 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 175,
@@ -1921,19 +1921,19 @@
     "home": "성남 FC",
     "away": "경남 FC",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 176,
     "date": "2026-05-17",
     "time": "16:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "대구 FC",
     "stadium": "김해 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 177,
@@ -1943,8 +1943,8 @@
     "home": "화성 FC",
     "away": "부산아이파크",
     "stadium": "화성종합경기타운",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 178,
@@ -1954,8 +1954,8 @@
     "home": "전북 현대 모터스",
     "away": "김천 상무 FC",
     "stadium": "전주월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 179,
@@ -1965,8 +1965,8 @@
     "home": "강원 FC",
     "away": "울산 HD FC",
     "stadium": "강릉하이원아레나",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 180,
@@ -1976,8 +1976,8 @@
     "home": "부천 FC 1995",
     "away": "포항 스틸러스",
     "stadium": "부천 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 181,
@@ -1987,8 +1987,8 @@
     "home": "충남아산 FC",
     "away": "수원 FC",
     "stadium": "이순신 종합운동장",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 182,
@@ -1996,10 +1996,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "전남 드래곤즈",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "광양 전용 구장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 183,
@@ -2009,8 +2009,8 @@
     "home": "경남 FC",
     "away": "수원 FC",
     "stadium": "창원 축구센터",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 184,
@@ -2020,19 +2020,19 @@
     "home": "충북 청주 FC",
     "away": "화성 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 185,
     "date": "2026-05-24",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "충남아산 FC",
     "stadium": "용인 미르스타디움",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 186,
@@ -2042,8 +2042,8 @@
     "home": "대구 FC",
     "away": "안산 그리너스 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 187,
@@ -2053,8 +2053,8 @@
     "home": "서울 이랜드 FC",
     "away": "성남 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 188,
@@ -2064,19 +2064,19 @@
     "home": "수원삼성블루윙즈",
     "away": "천안 시티 FC",
     "stadium": "수원월드컵경기장",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 189,
     "date": "2026-05-25",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "김포 FC",
     "stadium": "파주 스타디움",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 190,
@@ -2084,10 +2084,10 @@
     "time": "16:30",
     "league": "K2",
     "home": "부산아이파크",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 4,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 191,
@@ -2097,30 +2097,30 @@
     "home": "충남아산 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "이순신 종합운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 192,
     "date": "2026-05-30",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "대구 FC",
     "stadium": "용인 미르스타디움",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 193,
     "date": "2026-05-30",
     "time": "19:00",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "김포 FC",
     "stadium": "김해 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 194,
@@ -2130,8 +2130,8 @@
     "home": "수원 FC",
     "away": "성남 FC",
     "stadium": "수원종합운동장",
-    "homeScore": 0,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 195,
@@ -2141,8 +2141,8 @@
     "home": "화성 FC",
     "away": "경남 FC",
     "stadium": "화성종합경기타운",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 196,
@@ -2152,8 +2152,8 @@
     "home": "전남 드래곤즈",
     "away": "서울 이랜드 FC",
     "stadium": "광양 전용 구장",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 197,
@@ -2163,8 +2163,8 @@
     "home": "안산 그리너스 FC",
     "away": "천안 시티 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 198,
@@ -2172,10 +2172,10 @@
     "time": "19:30",
     "league": "K2",
     "home": "대구 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "대구iM뱅크PARK",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 199,
@@ -2185,8 +2185,8 @@
     "home": "부산아이파크",
     "away": "충남아산 FC",
     "stadium": "부산 구덕 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 200,
@@ -2194,10 +2194,10 @@
     "time": "19:30",
     "league": "K2",
     "home": "성남 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "탄천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 201,
@@ -2205,10 +2205,10 @@
     "time": "19:30",
     "league": "K2",
     "home": "경남 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "창원 축구센터",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 202,
@@ -2218,8 +2218,8 @@
     "home": "화성 FC",
     "away": "수원삼성블루윙즈",
     "stadium": "화성종합경기타운",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 203,
@@ -2229,8 +2229,8 @@
     "home": "천안 시티 FC",
     "away": "수원 FC",
     "stadium": "천안 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 204,
@@ -2240,8 +2240,8 @@
     "home": "서울 이랜드 FC",
     "away": "충북 청주 FC",
     "stadium": "목동종합운동장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 205,
@@ -2251,8 +2251,8 @@
     "home": "김포 FC",
     "away": "전남 드래곤즈",
     "stadium": "김포솔터축구장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 206,
@@ -2262,8 +2262,8 @@
     "home": "전북 현대 모터스",
     "away": "강원 FC",
     "stadium": "전주월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 207,
@@ -2273,8 +2273,8 @@
     "home": "대전 하나 시티즌",
     "away": "부천 FC 1995",
     "stadium": "대전 월드컵 경기장",
-    "homeScore": 2,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 208,
@@ -2284,8 +2284,8 @@
     "home": "FC 안양",
     "away": "포항 스틸러스",
     "stadium": "안양 종합 운동장",
-    "homeScore": 2,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 209,
@@ -2295,8 +2295,8 @@
     "home": "충북 청주 FC",
     "away": "대구 FC",
     "stadium": "청주 종합 경기장",
-    "homeScore": 1,
-    "awayScore": 5
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 210,
@@ -2306,19 +2306,19 @@
     "home": "안산 그리너스 FC",
     "away": "수원 FC",
     "stadium": "안산 와~스타디움",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 211,
     "date": "2026-07-04",
     "time": "19:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
-    "away": "용인 시민 축구단",
+    "home": "파주 프런티어 FC",
+    "away": "용인 FC",
     "stadium": "파주 스타디움",
-    "homeScore": 0,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 212,
@@ -2328,8 +2328,8 @@
     "home": "수원삼성블루윙즈",
     "away": "성남 FC",
     "stadium": "수원월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 213,
@@ -2339,8 +2339,8 @@
     "home": "FC 서울",
     "away": "인천 유나이티드 FC",
     "stadium": "서울월드컵경기장",
-    "homeScore": 1,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 214,
@@ -2350,8 +2350,8 @@
     "home": "김천 상무 FC",
     "away": "제주 SK FC",
     "stadium": "김천 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 215,
@@ -2361,19 +2361,19 @@
     "home": "광주 FC",
     "away": "울산 HD FC",
     "stadium": "광주 월드컵 경기장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 216,
     "date": "2026-07-05",
     "time": "19:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "서울 이랜드 FC",
     "stadium": "김해 종합 운동장",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 217,
@@ -2383,8 +2383,8 @@
     "home": "김포 FC",
     "away": "충남아산 FC",
     "stadium": "김포솔터축구장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 218,
@@ -2394,8 +2394,8 @@
     "home": "경남 FC",
     "away": "천안 시티 FC",
     "stadium": "창원 축구센터",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 219,
@@ -2405,8 +2405,8 @@
     "home": "전남 드래곤즈",
     "away": "부산아이파크",
     "stadium": "광양 전용 구장",
-    "homeScore": 3,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 220,
@@ -2425,7 +2425,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "천안 시티 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "천안 종합 운동장",
     "homeScore": null,
     "awayScore": null
@@ -2491,7 +2491,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "화성 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "화성종합경기타운",
     "homeScore": null,
     "awayScore": null
@@ -2501,7 +2501,7 @@
     "date": "2026-07-11",
     "time": "19:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "충북 청주 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -2689,7 +2689,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "수원삼성블루윙즈",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "수원월드컵경기장",
     "homeScore": null,
     "awayScore": null
@@ -2710,7 +2710,7 @@
     "date": "2026-07-19",
     "time": "19:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "화성 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -2798,7 +2798,7 @@
     "date": "2026-07-24",
     "time": "19:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "충북 청주 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -2920,7 +2920,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "김포 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "김포솔터축구장",
     "homeScore": null,
     "awayScore": null
@@ -2930,7 +2930,7 @@
     "date": "2026-07-26",
     "time": "19:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "안산 그리너스 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -2986,7 +2986,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "천안 시티 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "천안 종합 운동장",
     "homeScore": null,
     "awayScore": null
@@ -3074,7 +3074,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "전남 드래곤즈",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "광양 전용 구장",
     "homeScore": null,
     "awayScore": null
@@ -3085,7 +3085,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "안산 그리너스 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "안산 와~스타디움",
     "homeScore": null,
     "awayScore": null
@@ -3140,7 +3140,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "수원삼성블루윙즈",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "수원월드컵경기장",
     "homeScore": null,
     "awayScore": null
@@ -3150,7 +3150,7 @@
     "date": "2026-08-07",
     "time": "19:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "부산아이파크",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -3227,7 +3227,7 @@
     "date": "2026-08-08",
     "time": "19:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "수원 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -3293,7 +3293,7 @@
     "date": "2026-08-15",
     "time": "19:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "경남 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -3392,7 +3392,7 @@
     "date": "2026-08-16",
     "time": "19:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "성남 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -3459,7 +3459,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "수원 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "수원종합운동장",
     "homeScore": null,
     "awayScore": null
@@ -3525,7 +3525,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "충남아산 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "이순신 종합운동장",
     "homeScore": null,
     "awayScore": null
@@ -3547,7 +3547,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "서울 이랜드 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "목동종합운동장",
     "homeScore": null,
     "awayScore": null
@@ -3679,7 +3679,7 @@
     "time": "19:30",
     "league": "K2",
     "home": "경남 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "창원 축구센터",
     "homeScore": null,
     "awayScore": null
@@ -3755,8 +3755,8 @@
     "date": "2026-08-30",
     "time": "19:30",
     "league": "K2",
-    "home": "김해시청 축구단",
-    "away": "용인 시민 축구단",
+    "home": "김해 FC 2008",
+    "away": "용인 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
     "awayScore": null
@@ -3788,7 +3788,7 @@
     "date": "2026-09-04",
     "time": "19:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "대구 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -3865,7 +3865,7 @@
     "date": "2026-09-05",
     "time": "19:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "수원 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -3876,7 +3876,7 @@
     "date": "2026-09-05",
     "time": "19:00",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "전남 드래곤즈",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -4031,7 +4031,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "대구 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "대구iM뱅크PARK",
     "homeScore": null,
     "awayScore": null
@@ -4130,7 +4130,7 @@
     "time": "19:00",
     "league": "K2",
     "home": "부산아이파크",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "부산 구덕 운동장",
     "homeScore": null,
     "awayScore": null
@@ -4250,7 +4250,7 @@
     "date": "2026-09-20",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "경남 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -4283,8 +4283,8 @@
     "date": "2026-09-20",
     "time": "19:00",
     "league": "K2",
-    "home": "김해시청 축구단",
-    "away": "파주 시민 축구단",
+    "home": "김해 FC 2008",
+    "away": "파주 프런티어 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
     "awayScore": null
@@ -4383,7 +4383,7 @@
     "time": "14:00",
     "league": "K2",
     "home": "전남 드래곤즈",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "광양 전용 구장",
     "homeScore": null,
     "awayScore": null
@@ -4393,7 +4393,7 @@
     "date": "2026-10-10",
     "time": "14:00",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "부산아이파크",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -4426,7 +4426,7 @@
     "date": "2026-10-10",
     "time": "16:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "충남아산 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -4503,7 +4503,7 @@
     "date": "2026-10-17",
     "time": "16:30",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "안산 그리너스 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -4515,7 +4515,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "김포 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "김포솔터축구장",
     "homeScore": null,
     "awayScore": null
@@ -4570,7 +4570,7 @@
     "time": "14:00",
     "league": "K2",
     "home": "서울 이랜드 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "목동종합운동장",
     "homeScore": null,
     "awayScore": null
@@ -4691,7 +4691,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "김포 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "김포솔터축구장",
     "homeScore": null,
     "awayScore": null
@@ -4746,7 +4746,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "충북 청주 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "청주 종합 경기장",
     "homeScore": null,
     "awayScore": null
@@ -4756,7 +4756,7 @@
     "date": "2026-10-25",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "화성 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -4778,7 +4778,7 @@
     "date": "2026-10-31",
     "time": "14:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "서울 이랜드 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -4834,7 +4834,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "충북 청주 FC",
-    "away": "파주 시민 축구단",
+    "away": "파주 프런티어 FC",
     "stadium": "청주 종합 경기장",
     "homeScore": null,
     "awayScore": null
@@ -4844,7 +4844,7 @@
     "date": "2026-11-01",
     "time": "16:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "천안 시티 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -4888,7 +4888,7 @@
     "date": "2026-11-07",
     "time": "16:30",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "화성 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -4911,7 +4911,7 @@
     "time": "14:00",
     "league": "K2",
     "home": "수원삼성블루윙즈",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "수원월드컵경기장",
     "homeScore": null,
     "awayScore": null
@@ -4932,7 +4932,7 @@
     "date": "2026-11-08",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "충남아산 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -4977,7 +4977,7 @@
     "time": "16:30",
     "league": "K2",
     "home": "성남 FC",
-    "away": "용인 시민 축구단",
+    "away": "용인 FC",
     "stadium": "탄천 종합 운동장",
     "homeScore": null,
     "awayScore": null
@@ -4988,7 +4988,7 @@
     "time": "14:00",
     "league": "K2",
     "home": "대구 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "대구iM뱅크PARK",
     "homeScore": null,
     "awayScore": null
@@ -5009,7 +5009,7 @@
     "date": "2026-11-22",
     "time": "16:30",
     "league": "K2",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "천안 시티 FC",
     "stadium": "파주 스타디움",
     "homeScore": null,
@@ -5031,8 +5031,8 @@
     "date": "2026-11-29",
     "time": "00:00",
     "league": "K2",
-    "home": "용인 시민 축구단",
-    "away": "파주 시민 축구단",
+    "home": "용인 FC",
+    "away": "파주 프런티어 FC",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
     "awayScore": null
@@ -5064,7 +5064,7 @@
     "date": "2026-11-29",
     "time": "00:00",
     "league": "K2",
-    "home": "김해시청 축구단",
+    "home": "김해 FC 2008",
     "away": "성남 FC",
     "stadium": "김해 종합 운동장",
     "homeScore": null,
@@ -5122,8 +5122,8 @@
     "home": "양산 유나이티드 FC",
     "away": "안성시민축구단",
     "stadium": "미정",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 467,
@@ -5133,8 +5133,8 @@
     "home": "연수 송도 FC",
     "away": "울산남구 ULSAN FC",
     "stadium": "미정",
-    "homeScore": 0,
-    "awayScore": 4
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 468,
@@ -5144,8 +5144,8 @@
     "home": "청주 쇼킹 FC",
     "away": "양천 TNT FC",
     "stadium": "미정",
-    "homeScore": 3,
-    "awayScore": 9
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 469,
@@ -5155,8 +5155,8 @@
     "home": "인천서구 서곶 SM FC",
     "away": "여수 아름 FC",
     "stadium": "미정",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 470,
@@ -5166,8 +5166,8 @@
     "home": "진천 HR FC",
     "away": "시흥시민축구단",
     "stadium": "진천종합운동장",
-    "homeScore": 1,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 471,
@@ -5177,8 +5177,8 @@
     "home": "울산시민축구단",
     "away": "춘천시민축구단",
     "stadium": "울산종합운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 472,
@@ -5188,8 +5188,8 @@
     "home": "FC 목포",
     "away": "안성시민축구단",
     "stadium": "목포국제축구센터",
-    "homeScore": 3,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 473,
@@ -5199,8 +5199,8 @@
     "home": "부산교통공사 축구단",
     "away": "기장군민축구단",
     "stadium": "구덕운동장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 474,
@@ -5210,8 +5210,8 @@
     "home": "진주시민축구단",
     "away": "세종 SA FC",
     "stadium": "진주종합경기장",
-    "homeScore": 2,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 475,
@@ -5221,8 +5221,8 @@
     "home": "경주 한국수력원자력",
     "away": "서산 파이오니아 FC",
     "stadium": "경주시민운동장",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 476,
@@ -5232,8 +5232,8 @@
     "home": "울산남구 ULSAN FC",
     "away": "양평 FC",
     "stadium": "미정",
-    "homeScore": 1,
-    "awayScore": 5
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 477,
@@ -5243,8 +5243,8 @@
     "home": "평택 시티즌 FC",
     "away": "여주 FC",
     "stadium": "소사벌레포츠타운",
-    "homeScore": 1,
-    "awayScore": 3
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 478,
@@ -5254,8 +5254,8 @@
     "home": "함안군민축구단",
     "away": "당진시민축구단",
     "stadium": "함안종합운동장",
-    "homeScore": 0,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 479,
@@ -5265,8 +5265,8 @@
     "home": "남양주시민축구단",
     "away": "서울 중랑 축구단",
     "stadium": "남양주체육문화센터 주경기장",
-    "homeScore": 3,
-    "awayScore": 1
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 480,
@@ -5276,8 +5276,8 @@
     "home": "양천 TNT FC",
     "away": "평창 유나이티드 FC",
     "stadium": "미정",
-    "homeScore": 1,
-    "awayScore": 2
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 481,
@@ -5287,8 +5287,8 @@
     "home": "창원 FC",
     "away": "금산 인삼 FC",
     "stadium": "창원축구센터 주경기장",
-    "homeScore": 3,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 482,
@@ -5298,8 +5298,8 @@
     "home": "포천시민축구단",
     "away": "대전 코레일 FC",
     "stadium": "포천종합운동장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 483,
@@ -5309,8 +5309,8 @@
     "home": "거제시민축구단",
     "away": "인천서구 서곶 SM FC",
     "stadium": "거제종합운동장",
-    "homeScore": 4,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 484,
@@ -5320,8 +5320,8 @@
     "home": "FC 강릉",
     "away": "제천시민축구단",
     "stadium": "강릉종합운동장",
-    "homeScore": 2,
-    "awayScore": 0
+    "homeScore": null,
+    "awayScore": null
   },
   {
     "id": 485,
@@ -5427,7 +5427,7 @@
     "date": "2026-07-15",
     "time": "19:00",
     "league": "코리아컵",
-    "home": "용인 시민 축구단",
+    "home": "용인 FC",
     "away": "당진시민축구단",
     "stadium": "용인 미르스타디움",
     "homeScore": null,
@@ -5461,7 +5461,7 @@
     "time": "19:00",
     "league": "코리아컵",
     "home": "창원 FC",
-    "away": "김해시청 축구단",
+    "away": "김해 FC 2008",
     "stadium": "창원축구센터 주경기장",
     "homeScore": null,
     "awayScore": null
@@ -5493,7 +5493,7 @@
     "date": "2026-07-15",
     "time": "19:00",
     "league": "코리아컵",
-    "home": "파주 시민 축구단",
+    "home": "파주 프런티어 FC",
     "away": "FC 강릉",
     "stadium": "파주 스타디움",
     "homeScore": null,

@@ -9,9 +9,13 @@ import {
   SafeAreaView,
   StyleSheet,
   ActivityIndicator,
+  Share,
+  Linking,
+  Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { Colors } from '../constants/Colors';
+import { sectionLabelBase } from '../constants/sharedStyles';
 import { showAlert } from '../utils/appAlert';
 import { calculateOutcome } from '../utils/achievements';
 import {
@@ -106,15 +110,37 @@ export default function FriendsScreen({
     return () => { cancelled = true; };
   }, [activeTab, friends]);
 
-  // Deep link (kleaguediary://friend/CODE) landed - prefill the input and
-  // search right away so the receiver only has to press 추가.
+  // Deep link (kleaguediary://friend/CODE) landed - send the friend request
+  // right away so opening the shared link is itself the "add friend" action,
+  // no extra manual search/tap needed.
   useEffect(() => {
     if (initialSearchCode) {
       setSearchCode(initialSearchCode);
-      runSearch(initialSearchCode);
+      autoSendFromCode(initialSearchCode);
       if (onConsumeSearchCode) onConsumeSearchCode();
     }
   }, [initialSearchCode]);
+
+  const autoSendFromCode = async (rawCode) => {
+    const code = (rawCode || '').trim().toUpperCase();
+    if (!userId) {
+      showAlert('로그인 필요', '친구 기능은 로그인 후 이용할 수 있어요.');
+      return;
+    }
+    if (code.length < 4) return;
+    setSearching(true);
+    const profile = await findProfileByFriendCode(code);
+    setSearching(false);
+    if (!profile) {
+      setSearchResult('notfound');
+      return;
+    }
+    if (profile.id === userId) {
+      showAlert('알림', '자기 자신은 친구로 추가할 수 없어요.');
+      return;
+    }
+    handleSendRequest(profile);
+  };
 
   const refreshFriends = async () => {
     const rows = await listFriends(userId);
@@ -209,6 +235,23 @@ export default function FriendsScreen({
     }
     await Clipboard.setStringAsync(myCode);
     showAlert('복사 완료', '친구코드가 클립보드에 복사됐어요.');
+  };
+
+  // Shares a deep link that, when opened, auto-sends a friend request to me
+  // (see the initialSearchCode effect above) - no manual code entry needed.
+  const handleShareLink = async () => {
+    if (!myCode) {
+      showAlert('로그인 필요', '친구 기능은 로그인 후 이용할 수 있어요.');
+      return;
+    }
+    const link = Platform.OS === 'web' && typeof window !== 'undefined'
+      ? `${window.location.origin}?friend=${myCode}`
+      : Linking.createURL(`friend/${myCode}`);
+    try {
+      await Share.share({ message: `또직관에서 친구 추가하기!\n${link}` });
+    } catch (e) {
+      showAlert('공유하기 실패', '잠시 후 다시 시도해주세요.');
+    }
   };
 
   if (viewingFriend) {
@@ -421,10 +464,16 @@ export default function FriendsScreen({
           <Text style={styles.myCodeValue} selectable={true}>
             {myCode || '--------'}
           </Text>
-          <TouchableOpacity style={styles.shareBtn} onPress={handleCopyCode} activeOpacity={0.8}>
-            <Ionicons name="copy-outline" size={15} color="#ffffff" />
-            <Text style={styles.shareBtnText}>코드 복사하기</Text>
-          </TouchableOpacity>
+          <View style={styles.myCodeBtnRow}>
+            <TouchableOpacity style={styles.shareBtn} onPress={handleCopyCode} activeOpacity={0.8}>
+              <Ionicons name="copy-outline" size={15} color="#ffffff" />
+              <Text style={styles.shareBtnText}>코드 복사하기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.shareBtn} onPress={handleShareLink} activeOpacity={0.8}>
+              <Ionicons name="share-social-outline" size={15} color="#ffffff" />
+              <Text style={styles.shareBtnText}>링크 공유하기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* 친구코드로 추가 */}
@@ -623,17 +672,21 @@ const styles = StyleSheet.create({
   myCodeValue: {
     color: '#ffffff',
     fontSize: 28,
-    fontWeight: '950',
+    fontWeight: '900',
     letterSpacing: 4,
     marginTop: 6,
     marginBottom: 14,
+  },
+  myCodeBtnRow: {
+    flexDirection: 'row',
+    gap: 8,
   },
   shareBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: 'rgba(255,255,255,0.15)',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 8,
   },
@@ -643,8 +696,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   sectionLabel: {
-    fontSize: 11.5,
-    fontWeight: '800',
+    ...sectionLabelBase,
     marginBottom: 10,
     marginLeft: 2,
   },
@@ -819,7 +871,7 @@ const styles = StyleSheet.create({
   feedPlaceholderText: {
     color: 'rgba(255,255,255,0.4)',
     fontSize: 11,
-    fontWeight: '850',
+    fontWeight: '800',
   },
   feedPhotoNavBtn: {
     position: 'absolute',

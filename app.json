@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "K리그 직관일지",
+    "name": "또직관",
     "slug": "kleague-diary-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,8 +9,8 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#001C48"
+      "resizeMode": "cover",
+      "backgroundColor": "#031024"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -28,8 +28,11 @@
       "backgroundColor": "#ffffff",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#001C48"
-      }
+        "backgroundColor": "#031024"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,7 +44,21 @@
           "photosPermission": "직관 사진을 일지에 첨부하기 위해 사진 라이브러리 접근 권한이 필요합니다.",
           "cameraPermission": "직관 현장 사진을 촬영해 일지에 첨부하기 위해 카메라 접근 권한이 필요합니다."
         }
-      ]
-    ]
+      ],
+      [
+        "react-native-google-mobile-ads/app.plugin.js",
+        {
+          "androidAppId": "ca-app-pub-2308444497321939~4607420846",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ],
+      "./plugins/withKotlinSkipMetadataCheck.js"
+    ],
+    "owner": "saminyong",
+    "extra": {
+      "eas": {
+        "projectId": "eaa0a9f8-3d1c-4e39-af92-4a9f4a31ec8a"
+      }
+    }
   }
 }

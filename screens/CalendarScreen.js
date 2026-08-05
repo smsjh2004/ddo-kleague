@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,16 +15,26 @@ import {
 import MOCK_SCHEDULE from '../constants/schedule.json';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';
-import { getTodayString } from '../utils/date';
+import { getTodayString, buildMonthGrid } from '../utils/date';
+import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
+import AdBanner from '../components/AdBanner';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
+
+const DIVISION_OPTIONS = [
+  { key: 'all', label: '전체' },
+  { key: 'K1', label: 'K리그 1' },
+  { key: 'K2', label: 'K리그 2' },
+  { key: '코리아컵', label: '코리아컵' },
+];
 
 export default function CalendarScreen({
   theme = 'light',
   logs = [],
   myTeam,
   schedule = [],
+  isAdFree = false,
   onWriteDiary,
   onViewDiaryDetail,
 }) {
@@ -36,7 +46,9 @@ export default function CalendarScreen({
   const [activeMatch, setActiveMatch] = useState(null);
   // No myTeam yet -> default to showing everyone's schedule instead of an empty "my team" view
   const [viewMode, setViewMode] = useState(() => (myTeam && myTeam.trim() !== '' ? 'myteam' : 'all'));
-  const [divisionFilter, setDivisionFilter] = useState('all'); // 'all' | 'K1' | 'K2'
+  const [divisionFilter, setDivisionFilter] = useState('all'); // 'all' | 'K1' | 'K2' | '코리아컵'
+  const [teamFilter, setTeamFilter] = useState(''); // '' = every team
+  const [filterSheetVisible, setFilterSheetVisible] = useState(false);
 
   const activeColors = Colors[theme];
   const isDark = theme === 'dark';
@@ -44,31 +56,10 @@ export default function CalendarScreen({
   // Light theme brand accent is navy, dark theme's is red - same swap used for the bottom tab bar in App.js
   const segmentActiveColor = isDark ? activeColors.brandRed : activeColors.brandNavy;
 
-  const sheetTranslateY = React.useRef(new Animated.Value(0)).current;
-  const sheetPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          sheetTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setSheetVisible(false);
-          setTimeout(() => {
-            sheetTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(sheetTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const { translateY: sheetTranslateY, panResponder: sheetPanResponder } =
+    useSwipeDismissModal(() => setSheetVisible(false));
+  const { translateY: filterTranslateY, panResponder: filterPanResponder } =
+    useSwipeDismissModal(() => setFilterSheetVisible(false));
 
   const isMatchOfSelectedTeams = (match) => {
     return !!cleanMyTeam && (match.home.trim() === cleanMyTeam || match.away.trim() === cleanMyTeam);
@@ -97,19 +88,46 @@ export default function CalendarScreen({
   // Calendar cell math helpers
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth(); // 0-11
-  const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
-
-  const firstDayIndex = new Date(year, month, 1).getDay(); // weekday index (0-6)
-  const lastDate = new Date(year, month + 1, 0).getDate(); // days in month
-  const prevLastDate = new Date(year, month, 0).getDate(); // days in previous month
+  const { firstDayIndex, lastDate, prevLastDate, monthStr } = buildMonthGrid(year, month);
 
   // Filter matches of this visible month: "내 팀 경기만" narrows to favorite
-  // teams, "전체 일정 보기" shows everything (optionally narrowed by division)
-  const monthMatches = matchesSource.filter((match) => {
+  // teams, "전체 일정 보기" shows everything (optionally narrowed by division
+  // and/or a specific team, both picked from the filter bottom sheet)
+  const monthMatches = useMemo(() => matchesSource.filter((match) => {
     if (!match.date.startsWith(monthStr)) return false;
     if (viewMode === 'myteam') return isMatchOfSelectedTeams(match);
-    return divisionFilter === 'all' || match.league === divisionFilter;
-  });
+    if (divisionFilter !== 'all' && match.league !== divisionFilter) return false;
+    if (teamFilter && match.home.trim() !== teamFilter && match.away.trim() !== teamFilter) return false;
+    return true;
+  }), [matchesSource, monthStr, viewMode, divisionFilter, teamFilter, cleanMyTeam]);
+
+  // Team names selectable in the filter sheet, scoped to the currently chosen
+  // division (코리아컵 rosters differ entirely from K1/K2, so re-narrowing
+  // avoids a huge combined list when a division is already picked)
+  const filterableTeams = useMemo(() => {
+    const scoped = divisionFilter === 'all'
+      ? matchesSource
+      : matchesSource.filter((m) => m.league === divisionFilter);
+    const names = new Set();
+    scoped.forEach((m) => { names.add(m.home.trim()); names.add(m.away.trim()); });
+    return Array.from(names).sort((a, b) => a.localeCompare(b, 'ko'));
+  }, [matchesSource, divisionFilter]);
+
+  // All of this month's matches grouped by date (unfiltered by viewMode/division)
+  // for the day-cell grid, which needs every match on a day regardless of the
+  // current view filter - avoids re-filtering the full ~520-entry schedule per
+  // day cell on every render.
+  const monthMatchesByDate = useMemo(() => {
+    const map = new Map();
+    for (const m of matchesSource) {
+      if (!m.date.startsWith(monthStr)) continue;
+      if (!map.has(m.date)) map.set(m.date, []);
+      map.get(m.date).push(m);
+    }
+    return map;
+  }, [matchesSource, monthStr]);
+
+  const logDatesSet = useMemo(() => new Set(logs.map((l) => l.date)), [logs]);
 
   // Filter visible list based on day click selection
   const dayFilteredMatches = selectedDay
@@ -119,15 +137,21 @@ export default function CalendarScreen({
       })
     : monthMatches;
 
-  // "전체 일정 보기": bubble myTeam's matches to the top of the card list
-  // (stable sort keeps everything else in its original order)
-  const displayedMatches = viewMode === 'all'
-    ? [...dayFilteredMatches].sort((a, b) => {
-        const aFav = isMatchOfSelectedTeams(a) ? 0 : 1;
-        const bFav = isMatchOfSelectedTeams(b) ? 0 : 1;
-        return aFav - bFav;
-      })
-    : dayFilteredMatches;
+  // Chronological order (date, then kickoff time) - schedule.json isn't
+  // globally date-sorted across competitions (코리아컵 entries are appended
+  // as their own block after K1/K2), so without this a day mixing 코리아컵
+  // with K1/K2 matches rendered out of kickoff order. MyTeam's match on a
+  // shared date/time is a same-slot tiebreak only, not a full bubble-to-top.
+  const displayedMatches = useMemo(() => [...dayFilteredMatches].sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+    if (a.time !== b.time) return a.time < b.time ? -1 : 1;
+    if (viewMode === 'all') {
+      const aFav = isMatchOfSelectedTeams(a) ? 0 : 1;
+      const bFav = isMatchOfSelectedTeams(b) ? 0 : 1;
+      return aFav - bFav;
+    }
+    return 0;
+  }), [dayFilteredMatches, viewMode, cleanMyTeam]);
 
   // Functional updates so these stay correct even when called from a
   // PanResponder ref created on an earlier render (swipe gesture below).
@@ -202,7 +226,7 @@ export default function CalendarScreen({
     // 2. Current month cells
     for (let i = 1; i <= lastDate; i++) {
       const cellDayStr = `${monthStr}-${i.toString().padStart(2, '0')}`;
-      const dayMatches = matchesSource.filter((m) => m.date === cellDayStr);
+      const dayMatches = monthMatchesByDate.get(cellDayStr) || [];
       const favMatch = dayMatches.find((m) => isMatchOfSelectedTeams(m));
 
       // "내 팀 경기만" mode: H/A badge for the favorite team's match that day
@@ -211,17 +235,22 @@ export default function CalendarScreen({
         badgeType = favMatch.home.trim() === cleanMyTeam ? 'H' : 'A';
       }
 
-      // "전체 일정 보기" mode: a dot for any match that day, a glowing red
-      // dot instead if it's a favorite team's match
-      const dayMatchesInDivision = divisionFilter === 'all'
-        ? dayMatches
-        : dayMatches.filter((m) => m.league === divisionFilter);
+      // "전체 일정 보기" mode: a dot for any match that day matching the
+      // current division/team filter, a glowing red dot instead if it's a
+      // favorite team's match OR (dayMatchesInDivision is already scoped to
+      // teamFilter, so a non-empty match there guarantees it's that team's
+      // match) the specific team currently picked in the filter sheet.
+      const dayMatchesInDivision = dayMatches.filter((m) => {
+        if (divisionFilter !== 'all' && m.league !== divisionFilter) return false;
+        if (teamFilter && m.home.trim() !== teamFilter && m.away.trim() !== teamFilter) return false;
+        return true;
+      });
       const showAllModeDot = viewMode === 'all' && dayMatchesInDivision.length > 0;
-      const showFavDot = showAllModeDot && !!favMatch;
+      const showFavDot = showAllModeDot && (!!favMatch || !!teamFilter);
 
       const isToday = cellDayStr === todayStr;
       const isSelected = selectedDay === i;
-      const dayHasLog = logs.some((l) => l.date === cellDayStr);
+      const dayHasLog = logDatesSet.has(cellDayStr);
 
       // Priority when a day is more than one thing at once: tapped selection
       // always wins (clearest, most immediate state), then "today", then a
@@ -298,6 +327,7 @@ export default function CalendarScreen({
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: activeColors.bgBody }}>
+      <AdBanner hidden={isAdFree} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
         {/* 내 팀 경기만 / 전체 일정 보기 세그먼트 토글 */}
@@ -332,34 +362,22 @@ export default function CalendarScreen({
           </View>
         )}
 
-        {/* 디비전 필터 (전체 일정 모드에서만) */}
+        {/* 필터 트리거 (전체 일정 모드에서만) - 리그/팀 필터는 바텀시트 안에서 선택 */}
         {viewMode === 'all' && (
-          <View style={styles.divisionFilterRow}>
-            {[
-              { key: 'all', label: '전체' },
-              { key: 'K1', label: 'K리그 1' },
-              { key: 'K2', label: 'K리그 2' },
-              { key: '코리아컵', label: '코리아컵' },
-            ].map((d) => {
-              const isActive = divisionFilter === d.key;
-              return (
-                <TouchableOpacity
-                  key={d.key}
-                  style={[
-                    styles.divisionPill,
-                    { borderColor: activeColors.borderColor, backgroundColor: activeColors.bgTag },
-                    isActive && { backgroundColor: activeColors.brandNavy, borderColor: 'transparent' },
-                  ]}
-                  onPress={() => { setDivisionFilter(d.key); setSelectedDay(null); }}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.divisionPillText, { color: isActive ? '#ffffff' : activeColors.textBody }]}>
-                    {d.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <TouchableOpacity
+            style={[styles.filterTriggerRow, { borderColor: activeColors.borderColor, backgroundColor: activeColors.bgTag }]}
+            onPress={() => setFilterSheetVisible(true)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="options-outline" size={15} color={activeColors.textBody} />
+            <Text style={[styles.filterTriggerText, { color: activeColors.textBody }]} numberOfLines={1}>
+              {teamFilter || (DIVISION_OPTIONS.find((d) => d.key === divisionFilter) || {}).label}
+            </Text>
+            {(divisionFilter !== 'all' || teamFilter) && (
+              <View style={[styles.filterActiveDot, { backgroundColor: activeColors.brandRed }]} />
+            )}
+            <Ionicons name="chevron-down" size={14} color={activeColors.textMuted} />
+          </TouchableOpacity>
         )}
 
         {/* Next Match D-Day Widget */}
@@ -391,14 +409,24 @@ export default function CalendarScreen({
         >
           {/* Calendar Header Navigation */}
           <View style={styles.calendarNavHeader}>
-            <TouchableOpacity onPress={handlePrevMonth} style={[styles.navBtn, { backgroundColor: activeColors.bgTag }]}>
-              <Ionicons name="chevron-back" size={16} color={activeColors.textBody} />
+            <TouchableOpacity
+              onPress={handlePrevMonth}
+              style={[styles.navBtn, { backgroundColor: activeColors.bgTag, borderColor: activeColors.borderColor }]}
+              activeOpacity={0.6}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="chevron-back" size={18} color={activeColors.textBody} />
             </TouchableOpacity>
             <Text style={[styles.monthTitleText, { color: isDark ? '#ffffff' : activeColors.brandNavy }]}>
               {year}년 {(month + 1).toString().padStart(2, '0')}월
             </Text>
-            <TouchableOpacity onPress={handleNextMonth} style={[styles.navBtn, { backgroundColor: activeColors.bgTag }]}>
-              <Ionicons name="chevron-forward" size={16} color={activeColors.textBody} />
+            <TouchableOpacity
+              onPress={handleNextMonth}
+              style={[styles.navBtn, { backgroundColor: activeColors.bgTag, borderColor: activeColors.borderColor }]}
+              activeOpacity={0.6}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="chevron-forward" size={18} color={activeColors.textBody} />
             </TouchableOpacity>
           </View>
 
@@ -491,23 +519,45 @@ export default function CalendarScreen({
                     </Text>
                   </View>
 
-                  <View style={styles.teamsGridRow}>
-                    <View style={styles.teamCol}>
-                      <TeamBadge teamName={match.home} size={24} />
-                      <Text style={[styles.teamNameLabel, { color: activeColors.textBody }]}>{match.home}</Text>
-                    </View>
-                    {match.homeScore !== undefined && match.homeScore !== null && match.awayScore !== undefined && match.awayScore !== null ? (
-                      <Text style={[styles.vsText, { fontWeight: '700', fontSize: 16, color: activeColors.brandRed }]}>
-                        {match.homeScore} : {match.awayScore}
-                      </Text>
-                    ) : (
-                      <Text style={styles.vsText}>VS</Text>
-                    )}
-                    <View style={[styles.teamCol, { flexDirection: 'row-reverse' }]}>
-                      <TeamBadge teamName={match.away} size={24} />
-                      <Text style={[styles.teamNameLabel, { color: activeColors.textBody, marginRight: 8 }]}>{match.away}</Text>
-                    </View>
-                  </View>
+                  {(() => {
+                    const isHomeFiltered = !!teamFilter && match.home.trim() === teamFilter;
+                    const isAwayFiltered = !!teamFilter && match.away.trim() === teamFilter;
+                    return (
+                      <View style={styles.teamsGridRow}>
+                        <View style={styles.teamCol}>
+                          <TeamBadge teamName={match.home} size={24} />
+                          <Text
+                            style={[
+                              styles.teamNameLabel,
+                              { color: isHomeFiltered ? activeColors.brandRed : activeColors.textBody },
+                              isHomeFiltered && styles.teamNameLabelFiltered,
+                            ]}
+                          >
+                            {match.home}
+                          </Text>
+                        </View>
+                        {match.homeScore !== undefined && match.homeScore !== null && match.awayScore !== undefined && match.awayScore !== null ? (
+                          <Text style={[styles.vsText, { fontWeight: '700', fontSize: 16, color: activeColors.brandRed }]}>
+                            {match.homeScore} : {match.awayScore}
+                          </Text>
+                        ) : (
+                          <Text style={styles.vsText}>VS</Text>
+                        )}
+                        <View style={[styles.teamCol, { flexDirection: 'row-reverse' }]}>
+                          <TeamBadge teamName={match.away} size={24} />
+                          <Text
+                            style={[
+                              styles.teamNameLabel,
+                              { marginRight: 8, color: isAwayFiltered ? activeColors.brandRed : activeColors.textBody },
+                              isAwayFiltered && styles.teamNameLabelFiltered,
+                            ]}
+                          >
+                            {match.away}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })()}
 
                   <View style={[styles.cardFooterRow, { borderTopColor: activeColors.dividerColor }]}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -633,6 +683,92 @@ export default function CalendarScreen({
           </TouchableWithoutFeedback>
         </TouchableOpacity>
       </Modal>
+
+      {/* Filter Bottom Sheet (division + team) */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={filterSheetVisible}
+        onRequestClose={() => setFilterSheetVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setFilterSheetVisible(false)}
+        >
+          <TouchableWithoutFeedback>
+            <Animated.View
+              style={[styles.filterSheet, { backgroundColor: activeColors.bgApp, transform: [{ translateY: filterTranslateY }] }]}
+            >
+              <View style={{ paddingTop: 14, paddingBottom: 10, alignItems: 'center' }} {...filterPanResponder.panHandlers}>
+                <View style={[styles.modalHeaderDrag, { marginBottom: 0 }]} />
+              </View>
+
+              <View style={[styles.divisionTabBar, { borderBottomColor: activeColors.borderColor }]}>
+                {DIVISION_OPTIONS.map((d) => {
+                  const isActive = divisionFilter === d.key;
+                  return (
+                    <TouchableOpacity
+                      key={d.key}
+                      style={styles.divisionTabBtn}
+                      onPress={() => { setDivisionFilter(d.key); setTeamFilter(''); setSelectedDay(null); }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.divisionTabText,
+                        { color: isActive ? segmentActiveColor : activeColors.textMuted }
+                      ]}>
+                        {d.label}
+                      </Text>
+                      {isActive && <View style={[styles.divisionTabUnderline, { backgroundColor: segmentActiveColor }]} />}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <Text style={[styles.filterSectionLabel, { color: activeColors.textMuted, marginTop: 16 }]}>팀</Text>
+              <ScrollView style={styles.teamFilterScroll} showsVerticalScrollIndicator={false}>
+                <View style={styles.teamCardGrid}>
+                  <TouchableOpacity
+                    style={[
+                      styles.teamCard,
+                      { backgroundColor: activeColors.bgCard, borderColor: activeColors.borderColor },
+                      !teamFilter && styles.teamCardActive,
+                    ]}
+                    onPress={() => { setTeamFilter(''); setSelectedDay(null); }}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="apps-outline" size={22} color={!teamFilter ? activeColors.brandRed : activeColors.textMuted} />
+                    <Text style={[styles.teamCardText, { color: activeColors.textBody }]} numberOfLines={1}>
+                      전체 팀
+                    </Text>
+                  </TouchableOpacity>
+                  {filterableTeams.map((name) => {
+                    const isActive = teamFilter === name;
+                    return (
+                      <TouchableOpacity
+                        key={name}
+                        style={[
+                          styles.teamCard,
+                          { backgroundColor: activeColors.bgCard, borderColor: activeColors.borderColor },
+                          isActive && styles.teamCardActive,
+                        ]}
+                        onPress={() => { setTeamFilter(isActive ? '' : name); setSelectedDay(null); }}
+                        activeOpacity={0.7}
+                      >
+                        <TeamBadge teamName={name} size={22} />
+                        <Text style={[styles.teamCardText, { color: activeColors.textBody }]} numberOfLines={1}>
+                          {name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -682,20 +818,90 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 14,
   },
-  divisionFilterRow: {
+  divisionTabBar: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    marginBottom: 14,
   },
-  divisionPill: {
+  divisionTabBtn: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  divisionTabText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+  },
+  divisionTabUnderline: {
+    position: 'absolute',
+    bottom: -1,
+    left: 16,
+    right: 16,
+    height: 2,
+    borderRadius: 1,
+  },
+  filterTriggerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 16,
-    borderWidth: 1,
+    marginBottom: 10,
   },
-  divisionPillText: {
+  filterTriggerText: {
     fontSize: 11.5,
     fontWeight: '800',
+    maxWidth: 160,
+  },
+  filterActiveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  filterSheet: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    maxHeight: height * 0.75,
+  },
+  filterSectionLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  teamFilterScroll: {
+    maxHeight: height * 0.4,
+  },
+  teamCardGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
+  },
+  teamCard: {
+    width: (width - 56) / 3,
+    borderWidth: 1.5,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  teamCardActive: {
+    borderColor: '#EE3224',
+    borderWidth: 2,
+  },
+  teamCardText: {
+    fontSize: 9.5,
+    fontWeight: '800',
+    marginTop: 6,
+    textAlign: 'center',
+    width: '100%',
   },
   calendarCard: {
     borderWidth: 1.5,
@@ -714,9 +920,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   navBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -897,6 +1104,9 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     fontWeight: '800',
   },
+  teamNameLabelFiltered: {
+    fontWeight: '900',
+  },
   vsText: {
     fontSize: 12,
     fontWeight: '900',
@@ -1063,7 +1273,7 @@ const styles = StyleSheet.create({
   ddayCountdownText: {
     color: '#ffffff',
     fontSize: 22,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   ddayHeaderRight: {
     alignItems: 'flex-end',

@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { LEAGUE_TEAMS, TEAM_COLORS } from '../constants/TeamData';
 import { Colors } from '../constants/Colors';
 import { showAlert } from '../utils/appAlert';
@@ -41,6 +42,31 @@ const TeamBadgePreview = ({ colors }) => {
   );
 };
 
+// Android's modern system Photo Picker (and the web picker) ignores
+// ImagePicker's allowsEditing/aspect crop UI entirely - a known platform
+// limitation, not a bug in this app. This center-crops the picked image to a
+// square as a guaranteed fallback so every platform ends up with a square
+// avatar, regardless of whether the OS offered an interactive crop step.
+async function cropToSquare(asset) {
+  if (!asset.width || !asset.height || asset.width === asset.height) {
+    return asset.uri;
+  }
+  const size = Math.min(asset.width, asset.height);
+  const originX = Math.floor((asset.width - size) / 2);
+  const originY = Math.floor((asset.height - size) / 2);
+  try {
+    const result = await ImageManipulator.manipulateAsync(
+      asset.uri,
+      [{ crop: { originX, originY, width: size, height: size } }],
+      { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return result.uri;
+  } catch (e) {
+    console.warn('cropToSquare failed, using original image:', e.message);
+    return asset.uri;
+  }
+}
+
 export default function OnboardingScreen({ theme = 'light', onComplete, defaultAvatarUrl = '' }) {
   // Onboarding Step: 1 = Team Selection, 2 = Nickname Input
   const [onboardStep, setOnboardStep] = useState(1);
@@ -67,7 +93,7 @@ export default function OnboardingScreen({ theme = 'light', onComplete, defaultA
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setAvatarUri(result.assets[0].uri);
+        setAvatarUri(await cropToSquare(result.assets[0]));
       }
     } catch (e) {
       console.error('Avatar Image Picker Error:', e);
@@ -143,7 +169,7 @@ export default function OnboardingScreen({ theme = 'light', onComplete, defaultA
         {/* Header Title Section */}
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: activeColors.brandNavy }]}>
-            K리그 직관일지
+            또직관
           </Text>
           <Text style={[styles.headerSubtitle, { color: activeColors.textMuted }]}>
             나만의 K리그 직관 기록과 승률 통계를 시작해 보세요!
@@ -205,7 +231,7 @@ export default function OnboardingScreen({ theme = 'light', onComplete, defaultA
               disabled={!tempSelectedTeam}
               activeOpacity={0.8}
             >
-              <Text style={styles.submitBtnText}>다음 단계로 (닉네임 설정)</Text>
+              <Text style={styles.submitBtnText}>다음 단계로</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -257,12 +283,15 @@ export default function OnboardingScreen({ theme = 'light', onComplete, defaultA
 
             {/* Selected Summary Section */}
             <View style={[styles.summaryCard, { backgroundColor: activeColors.bgInput, borderColor: activeColors.borderColor }]}>
-              <Text style={[styles.summaryTitle, { color: activeColors.textBody, borderBottomColor: activeColors.dividerColor }]}>선택 구단 정보</Text>
-              <View style={styles.summaryRow}>
-                <Text style={[styles.summaryLabel, { color: activeColors.textMuted }]}>마이팀</Text>
-                <Text style={[styles.summaryValue, { color: activeColors.brandNavy, fontWeight: 'bold' }]}>
-                  {tempSelectedTeam || '선택 안됨'}
-                </Text>
+              <Text style={[styles.summaryTitle, { color: activeColors.textMuted }]}>선택 구단 정보</Text>
+              <View style={styles.summaryTeamRow}>
+                <TeamBadgePreview colors={getTeamColors(tempSelectedTeam)} />
+                <View style={styles.summaryTeamTextWrap}>
+                  <Text style={[styles.summaryTeamTag, { color: activeColors.textMuted }]}>마이팀</Text>
+                  <Text style={[styles.summaryTeamName, { color: activeColors.brandNavy }]} numberOfLines={1}>
+                    {tempSelectedTeam || '선택 안됨'}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -433,12 +462,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   badgeContainer: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     overflow: 'hidden',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 2,
   },
   badgeHalf: {
     flex: 1,
@@ -472,24 +506,26 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   summaryTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '800',
     marginBottom: 10,
-    borderBottomWidth: 1,
-    paddingBottom: 6,
   },
-  summaryRow: {
+  summaryTeamRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 4,
+    alignItems: 'center',
+    gap: 10,
   },
-  summaryLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+  summaryTeamTextWrap: {
+    flex: 1,
   },
-  summaryValue: {
-    fontSize: 12,
+  summaryTeamTag: {
+    fontSize: 10.5,
     fontWeight: '700',
+    marginBottom: 2,
+  },
+  summaryTeamName: {
+    fontSize: 15,
+    fontWeight: '900',
   },
   submitBtn: {
     height: 48,

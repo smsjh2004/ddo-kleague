@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { sectionLabelBase } from '../constants/sharedStyles';
 import { listFriendDiaryLogs } from '../utils/api';
 import { getAchievementTitle, getAchievements, calculateOutcome } from '../utils/achievements';
 import TeamBadge from '../components/TeamBadge';
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   statLabel: {
     fontSize: 11,
@@ -284,8 +285,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sectionLabel: {
-    fontSize: 11.5,
-    fontWeight: '800',
+    ...sectionLabelBase,
     marginTop: 20,
     marginBottom: 10,
     marginLeft: 2,

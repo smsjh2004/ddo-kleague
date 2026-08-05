@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 22,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   metaRow: {
     flexDirection: 'row',

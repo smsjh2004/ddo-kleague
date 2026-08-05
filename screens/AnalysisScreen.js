@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,13 +9,15 @@ import {
   Modal,
   TouchableOpacity,
   Animated,
-  PanResponder,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';
 import { LEAGUE_TEAMS } from '../constants/TeamData';
 import { getTodayString } from '../utils/date';
 import { storage } from '../utils/storage';
+import { calculateOutcome } from '../utils/achievements';
+import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
+import useDragReorder from '../hooks/useDragReorder';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -114,318 +116,196 @@ export default function AnalysisScreen({ theme = 'light', logs = [], myTeam }) {
   };
 
   // Drag-to-reorder for the "통계 구성" list, via the "⋮" handle on each row.
-  // cardOrderRef always mirrors the latest cardOrder so the PanResponder
-  // callbacks (created once per key and cached) never read a stale array.
-  const cardOrderRef = React.useRef(cardOrder);
-  useEffect(() => {
-    cardOrderRef.current = cardOrder;
-  }, [cardOrder]);
+  const { dragKey, dragY, getDragResponder } = useDragReorder(
+    cardOrder, setCardOrder, CONFIG_ROW_HEIGHT, CARD_ORDER_KEY
+  );
 
-  const [dragKey, setDragKey] = useState(null);
-  const dragY = React.useRef(new Animated.Value(0)).current;
-  const dragStartIndexRef = React.useRef(0);
-  const dragResponders = React.useRef({}).current;
+  const { translateY: opponentTranslateY, panResponder: opponentPanResponder } =
+    useSwipeDismissModal(() => setOpponentModalVisible(false));
 
-  const getDragResponder = (key) => {
-    if (!dragResponders[key]) {
-      dragResponders[key] = PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: () => {
-          dragStartIndexRef.current = cardOrderRef.current.indexOf(key);
-          setDragKey(key);
-          dragY.setValue(0);
-        },
-        onPanResponderMove: (evt, gestureState) => {
-          const fromIndex = dragStartIndexRef.current;
-          const shift = Math.round(gestureState.dy / CONFIG_ROW_HEIGHT);
-          const toIndex = Math.min(Math.max(fromIndex + shift, 0), cardOrderRef.current.length - 1);
-          const currentIndex = cardOrderRef.current.indexOf(key);
-          if (toIndex !== currentIndex) {
-            const next = [...cardOrderRef.current];
-            next.splice(currentIndex, 1);
-            next.splice(toIndex, 0, key);
-            cardOrderRef.current = next;
-            setCardOrder(next);
-          }
-          // Compensate for the row's own flow-position shift so it keeps
-          // tracking the finger smoothly instead of jumping on each reorder.
-          dragY.setValue(gestureState.dy - (toIndex - fromIndex) * CONFIG_ROW_HEIGHT);
-        },
-        onPanResponderRelease: () => {
-          setDragKey(null);
-          dragY.setValue(0);
-          storage.setItem(CARD_ORDER_KEY, cardOrderRef.current);
-        },
-        onPanResponderTerminate: () => {
-          setDragKey(null);
-          dragY.setValue(0);
-        },
-      });
-    }
-    return dragResponders[key];
-  };
+  const { translateY: companionTranslateY, panResponder: companionPanResponder } =
+    useSwipeDismissModal(() => setCompanionModalVisible(false));
 
-  const opponentTranslateY = React.useRef(new Animated.Value(0)).current;
-  const opponentPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          opponentTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setOpponentModalVisible(false);
-          setTimeout(() => {
-            opponentTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(opponentTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const { translateY: stadiumTranslateY, panResponder: stadiumPanResponder } =
+    useSwipeDismissModal(() => setStadiumModalVisible(false));
 
-  const companionTranslateY = React.useRef(new Animated.Value(0)).current;
-  const companionPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          companionTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setCompanionModalVisible(false);
-          setTimeout(() => {
-            companionTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(companionTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  // All match-outcome-derived stats below are recomputed from filteredLogs via
+  // 7+ separate passes - memoized so dragging a card handle (which only
+  // changes cardOrder state) doesn't re-run every pass on every frame.
+  const derivedStats = useMemo(() => {
+    // 1. Overall Stats calculations
+    const totalMatches = filteredLogs.length;
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
 
-  const stadiumTranslateY = React.useRef(new Animated.Value(0)).current;
-  const stadiumPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          stadiumTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setStadiumModalVisible(false);
-          setTimeout(() => {
-            stadiumTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(stadiumTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+    filteredLogs.forEach((log) => {
+      const outcome = calculateOutcome(log, myTeam);
+      if (outcome === '승') wins++;
+      else if (outcome === '무') draws++;
+      else if (outcome === '패') losses++;
+    });
 
-  // Helper to determine match outcome relative to myTeam
-  const calculateOutcome = (log) => {
-    const home = log.homeTeam.trim();
-    const away = log.awayTeam.trim();
-    const homeScore = parseInt(log.homeScore);
-    const awayScore = parseInt(log.awayScore);
+    const winRate = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : '0.0';
 
-    if (isNaN(homeScore) || isNaN(awayScore)) return '무';
+    // Home vs Away Stats
+    let homeMatches = 0, homeWins = 0, homeDraws = 0, homeLosses = 0;
+    let awayMatches = 0, awayWins = 0, awayDraws = 0, awayLosses = 0;
 
-    const cleanMyTeam = myTeam.trim();
-    const isHome = home === cleanMyTeam;
-    const isAway = away === cleanMyTeam;
-
-    if (!isHome && !isAway) {
-      if (homeScore > awayScore) return '승';
-      if (homeScore < awayScore) return '패';
-      return '무';
-    }
-
-    if (homeScore === awayScore) return '무';
-
-    if (isHome) {
-      return homeScore > awayScore ? '승' : '패';
-    } else {
-      return awayScore > homeScore ? '승' : '패';
-    }
-  };
-
-  // 1. Overall Stats calculations
-  const totalMatches = filteredLogs.length;
-  let wins = 0;
-  let draws = 0;
-  let losses = 0;
-
-  filteredLogs.forEach((log) => {
-    const outcome = calculateOutcome(log);
-    if (outcome === '승') wins++;
-    else if (outcome === '무') draws++;
-    else if (outcome === '패') losses++;
-  });
-
-  const winRate = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : '0.0';
-
-  // Home vs Away Stats
-  let homeMatches = 0, homeWins = 0, homeDraws = 0, homeLosses = 0;
-  let awayMatches = 0, awayWins = 0, awayDraws = 0, awayLosses = 0;
-
-  filteredLogs.forEach((log) => {
-    const outcome = calculateOutcome(log);
-    const isHome = log.homeTeam.trim() === myTeam.trim();
-    if (isHome) {
-      homeMatches++;
-      if (outcome === '승') homeWins++;
-      else if (outcome === '무') homeDraws++;
-      else if (outcome === '패') homeLosses++;
-    } else {
-      awayMatches++;
-      if (outcome === '승') awayWins++;
-      else if (outcome === '무') awayDraws++;
-      else if (outcome === '패') awayLosses++;
-    }
-  });
-
-  const homeWinRate = homeMatches > 0 ? ((homeWins / homeMatches) * 100).toFixed(1) : '0.0';
-  const awayWinRate = awayMatches > 0 ? ((awayWins / awayMatches) * 100).toFixed(1) : '0.0';
-
-  // 2. Recent 10 Matches (Form Guide)
-  const recentLogs = [...filteredLogs].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10).reverse();
-
-  // 3. Monthly Attendances Chart data
-  const currentMonthNum = parseInt(getTodayString().split('-')[1]);
-  const monthlyData = Array.from({ length: 12 }, (_, i) => ({ month: i + 1, count: 0 }));
-  filteredLogs.forEach((log) => {
-    if (log.date) {
-      const m = parseInt(log.date.split('-')[1]);
-      if (m >= 1 && m <= 12) {
-        monthlyData[m - 1].count++;
+    filteredLogs.forEach((log) => {
+      const outcome = calculateOutcome(log, myTeam);
+      const isHome = log.homeTeam.trim() === myTeam.trim();
+      if (isHome) {
+        homeMatches++;
+        if (outcome === '승') homeWins++;
+        else if (outcome === '무') homeDraws++;
+        else if (outcome === '패') homeLosses++;
+      } else {
+        awayMatches++;
+        if (outcome === '승') awayWins++;
+        else if (outcome === '무') awayDraws++;
+        else if (outcome === '패') awayLosses++;
       }
+    });
+
+    const homeWinRate = homeMatches > 0 ? ((homeWins / homeMatches) * 100).toFixed(1) : '0.0';
+    const awayWinRate = awayMatches > 0 ? ((awayWins / awayMatches) * 100).toFixed(1) : '0.0';
+
+    // 2. Recent 10 Matches (Form Guide)
+    const recentLogs = [...filteredLogs].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10).reverse();
+
+    // 3. Monthly Attendances Chart data
+    const monthlyData = Array.from({ length: 12 }, (_, i) => ({ month: i + 1, count: 0 }));
+    filteredLogs.forEach((log) => {
+      if (log.date) {
+        const m = parseInt(log.date.split('-')[1]);
+        if (m >= 1 && m <= 12) {
+          monthlyData[m - 1].count++;
+        }
+      }
+    });
+
+    const maxMonthlyCount = Math.max(...monthlyData.map((d) => d.count), 1);
+
+    // 4. Opponent Leaderboard
+    const opponentMap = {};
+    filteredLogs.forEach((log) => {
+      const opponent = log.homeTeam.trim() === myTeam.trim() ? log.awayTeam.trim() : log.homeTeam.trim();
+      if (!opponentMap[opponent]) {
+        opponentMap[opponent] = { wins: 0, draws: 0, losses: 0, total: 0 };
+      }
+      const outcome = calculateOutcome(log, myTeam);
+      opponentMap[opponent].total++;
+      if (outcome === '승') opponentMap[opponent].wins++;
+      else if (outcome === '무') opponentMap[opponent].draws++;
+      else if (outcome === '패') opponentMap[opponent].losses++;
+    });
+
+    const leaderboard = Object.keys(opponentMap).map((name) => {
+      const stats = opponentMap[name];
+      const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
+      return { name, ...stats, winRate: wr };
+    });
+
+    leaderboard.sort((a, b) => b.winRate - a.winRate || b.total - a.total);
+
+    // 5. Stadium win-rate leaderboard
+    const stadiumMap = {};
+    filteredLogs.forEach((log) => {
+      const stadiumName = (log.stadium || '경기장 미상').trim() || '경기장 미상';
+      if (!stadiumMap[stadiumName]) {
+        stadiumMap[stadiumName] = { wins: 0, draws: 0, losses: 0, total: 0 };
+      }
+      const outcome = calculateOutcome(log, myTeam);
+      stadiumMap[stadiumName].total++;
+      if (outcome === '승') stadiumMap[stadiumName].wins++;
+      else if (outcome === '무') stadiumMap[stadiumName].draws++;
+      else if (outcome === '패') stadiumMap[stadiumName].losses++;
+    });
+
+    const stadiumStatsList = Object.keys(stadiumMap).map((name) => {
+      const stats = stadiumMap[name];
+      const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
+      return { name, ...stats, winRate: wr };
+    }).sort((a, b) => b.winRate - a.winRate || b.total - a.total);
+
+    // 6. Companion analysis
+    const companionMap = {};
+    filteredLogs.forEach((log) => {
+      const companionName = (log.companion || '혼관').trim() || '혼관';
+      if (!companionMap[companionName]) {
+        companionMap[companionName] = { wins: 0, draws: 0, losses: 0, total: 0 };
+      }
+      const outcome = calculateOutcome(log, myTeam);
+      companionMap[companionName].total++;
+      if (outcome === '승') companionMap[companionName].wins++;
+      else if (outcome === '무') companionMap[companionName].draws++;
+      else if (outcome === '패') companionMap[companionName].losses++;
+    });
+
+    const companionStatsList = Object.keys(companionMap).map((name) => {
+      const stats = companionMap[name];
+      const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
+      return { name, ...stats, winRate: wr };
+    }).sort((a, b) => b.winRate - a.winRate || b.total - a.total);
+
+    const candidates = companionStatsList.filter(c => c.total >= 1);
+    let defeatTotem = null;
+    if (candidates.length > 0) {
+      defeatTotem = [...candidates].sort((a, b) => a.winRate - b.winRate || b.total - a.total)[0];
     }
-  });
 
-  const maxMonthlyCount = Math.max(...monthlyData.map((d) => d.count), 1);
+    // 7. Weather analysis
+    const weatherMap = {
+      '☀️맑음': { wins: 0, draws: 0, losses: 0, total: 0 },
+      '☁️흐림': { wins: 0, draws: 0, losses: 0, total: 0 },
+      '🌧️비': { wins: 0, draws: 0, losses: 0, total: 0 },
+      '❄️눈': { wins: 0, draws: 0, losses: 0, total: 0 },
+    };
 
-  // 4. Opponent Leaderboard
-  const opponentMap = {};
-  filteredLogs.forEach((log) => {
-    const opponent = log.homeTeam.trim() === myTeam.trim() ? log.awayTeam.trim() : log.homeTeam.trim();
-    if (!opponentMap[opponent]) {
-      opponentMap[opponent] = { wins: 0, draws: 0, losses: 0, total: 0 };
+    filteredLogs.forEach((log) => {
+      const w = log.weather || '☀️맑음';
+      if (!weatherMap[w]) {
+        weatherMap[w] = { wins: 0, draws: 0, losses: 0, total: 0 };
+      }
+      const outcome = calculateOutcome(log, myTeam);
+      weatherMap[w].total++;
+      if (outcome === '승') weatherMap[w].wins++;
+      else if (outcome === '무') weatherMap[w].draws++;
+      else if (outcome === '패') weatherMap[w].losses++;
+    });
+
+    const weatherStatsList = Object.keys(weatherMap).map((wName) => {
+      const stats = weatherMap[wName];
+      const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
+      return { name: wName, ...stats, winRate: wr };
+    });
+
+    const weatherCandidates = weatherStatsList.filter(w => w.total >= 1);
+    let bestWeather = null;
+    if (weatherCandidates.length > 0) {
+      bestWeather = [...weatherCandidates].sort((a, b) => b.winRate - a.winRate || b.total - a.total)[0];
     }
-    const outcome = calculateOutcome(log);
-    opponentMap[opponent].total++;
-    if (outcome === '승') opponentMap[opponent].wins++;
-    else if (outcome === '무') opponentMap[opponent].draws++;
-    else if (outcome === '패') opponentMap[opponent].losses++;
-  });
 
-  const leaderboard = Object.keys(opponentMap).map((name) => {
-    const stats = opponentMap[name];
-    const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-    return { name, ...stats, winRate: wr };
-  });
+    return {
+      totalMatches, wins, draws, losses, winRate,
+      homeMatches, homeWins, homeDraws, homeLosses, awayMatches, awayWins, awayDraws, awayLosses,
+      homeWinRate, awayWinRate, recentLogs, monthlyData, maxMonthlyCount,
+      leaderboard, stadiumStatsList, companionStatsList, defeatTotem,
+      weatherStatsList, bestWeather,
+    };
+  }, [filteredLogs, myTeam]);
 
-  leaderboard.sort((a, b) => b.winRate - a.winRate || b.total - a.total);
+  const {
+    totalMatches, wins, draws, losses, winRate,
+    homeMatches, homeWins, homeDraws, homeLosses, awayMatches, awayWins, awayDraws, awayLosses,
+    homeWinRate, awayWinRate, recentLogs, monthlyData, maxMonthlyCount,
+    leaderboard, stadiumStatsList, companionStatsList, defeatTotem,
+    weatherStatsList, bestWeather,
+  } = derivedStats;
 
-  // 5. Stadium win-rate leaderboard
-  const stadiumMap = {};
-  filteredLogs.forEach((log) => {
-    const stadiumName = (log.stadium || '경기장 미상').trim() || '경기장 미상';
-    if (!stadiumMap[stadiumName]) {
-      stadiumMap[stadiumName] = { wins: 0, draws: 0, losses: 0, total: 0 };
-    }
-    const outcome = calculateOutcome(log);
-    stadiumMap[stadiumName].total++;
-    if (outcome === '승') stadiumMap[stadiumName].wins++;
-    else if (outcome === '무') stadiumMap[stadiumName].draws++;
-    else if (outcome === '패') stadiumMap[stadiumName].losses++;
-  });
+  const currentMonthNum = parseInt(getTodayString().split('-')[1]);
 
-  const stadiumStatsList = Object.keys(stadiumMap).map((name) => {
-    const stats = stadiumMap[name];
-    const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-    return { name, ...stats, winRate: wr };
-  }).sort((a, b) => b.winRate - a.winRate || b.total - a.total);
-
-  // 6. Companion analysis
-  const companionMap = {};
-  filteredLogs.forEach((log) => {
-    const companionName = (log.companion || '혼관').trim() || '혼관';
-    if (!companionMap[companionName]) {
-      companionMap[companionName] = { wins: 0, draws: 0, losses: 0, total: 0 };
-    }
-    const outcome = calculateOutcome(log);
-    companionMap[companionName].total++;
-    if (outcome === '승') companionMap[companionName].wins++;
-    else if (outcome === '무') companionMap[companionName].draws++;
-    else if (outcome === '패') companionMap[companionName].losses++;
-  });
-
-  const companionStatsList = Object.keys(companionMap).map((name) => {
-    const stats = companionMap[name];
-    const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-    return { name, ...stats, winRate: wr };
-  }).sort((a, b) => b.winRate - a.winRate || b.total - a.total);
-
-  const candidates = companionStatsList.filter(c => c.total >= 1);
-  let defeatTotem = null;
-  if (candidates.length > 0) {
-    defeatTotem = [...candidates].sort((a, b) => a.winRate - b.winRate || b.total - a.total)[0];
-  }
-
-  // 7. Weather analysis
-  const weatherMap = {
-    '☀️맑음': { wins: 0, draws: 0, losses: 0, total: 0 },
-    '☁️흐림': { wins: 0, draws: 0, losses: 0, total: 0 },
-    '🌧️비': { wins: 0, draws: 0, losses: 0, total: 0 },
-    '❄️눈': { wins: 0, draws: 0, losses: 0, total: 0 },
-  };
-
-  filteredLogs.forEach((log) => {
-    const w = log.weather || '☀️맑음';
-    if (!weatherMap[w]) {
-      weatherMap[w] = { wins: 0, draws: 0, losses: 0, total: 0 };
-    }
-    const outcome = calculateOutcome(log);
-    weatherMap[w].total++;
-    if (outcome === '승') weatherMap[w].wins++;
-    else if (outcome === '무') weatherMap[w].draws++;
-    else if (outcome === '패') weatherMap[w].losses++;
-  });
-
-  const weatherStatsList = Object.keys(weatherMap).map((wName) => {
-    const stats = weatherMap[wName];
-    const wr = stats.total > 0 ? (stats.wins / stats.total) * 100 : 0;
-    return { name: wName, ...stats, winRate: wr };
-  });
-
-  const weatherCandidates = weatherStatsList.filter(w => w.total >= 1);
-  let bestWeather = null;
-  if (weatherCandidates.length > 0) {
-    bestWeather = [...weatherCandidates].sort((a, b) => b.winRate - a.winRate || b.total - a.total)[0];
-  }
   // Circular progress calculations (clockwise from 12 o'clock)
   const wrNum = parseFloat(winRate);
   const rightAngle = wrNum <= 50 ? (wrNum * 3.6) - 180 : 0;
@@ -622,7 +502,7 @@ export default function AnalysisScreen({ theme = 'light', logs = [], myTeam }) {
       ) : (
         <View style={styles.formRow}>
           {recentLogs.map((log, i) => {
-            const outcome = calculateOutcome(log);
+            const outcome = calculateOutcome(log, myTeam);
             let bgStyle = styles.bgDraw;
             if (outcome === '승') bgStyle = styles.bgWin;
             if (outcome === '패') bgStyle = styles.bgLose;
@@ -1043,7 +923,7 @@ export default function AnalysisScreen({ theme = 'light', logs = [], myTeam }) {
           <View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
               <Text style={{ fontSize: 13, fontWeight: '700', color: activeColors.textBody }}>평균 심판 평가 점수</Text>
-              <Text style={{ fontSize: 18, fontWeight: '950', color: isDark ? activeColors.brandRed : activeColors.brandNavy }}>
+              <Text style={{ fontSize: 18, fontWeight: '900', color: isDark ? activeColors.brandRed : activeColors.brandNavy }}>
                 {avgScore}점 / 100점
               </Text>
             </View>
@@ -1574,7 +1454,7 @@ const styles = StyleSheet.create({
   },
   winRatePercentText: {
     fontSize: 22,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   winRateLabel: {
     fontSize: 10,

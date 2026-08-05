@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,12 +8,13 @@ import {
   ScrollView,
   SafeAreaView,
   Animated,
-  PanResponder,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { storage } from '../utils/storage';
 import { getBingoGrid, getStampedStadiumKeys } from '../constants/stadiumBingo';
 import { getAchievementTitle, getAchievements } from '../utils/achievements';
+import useDragReorder from '../hooks/useDragReorder';
+import AdBanner from '../components/AdBanner';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SettingsScreen from './SettingsScreen';
 import ProfileEditScreen from './ProfileEditScreen';
@@ -55,6 +56,9 @@ export default function MyPageScreen({
   onSetCustomAccent,
   isPremium,
   onSetIsPremium,
+  adFreeUntil,
+  onSetAdFreeUntil,
+  isAdFree = false,
   userId,
   pendingFriendCode,
   onConsumeFriendCode,
@@ -97,64 +101,25 @@ export default function MyPageScreen({
     storage.setItem(SECTION_ORDER_KEY, next);
   };
 
-  // Drag-to-reorder for the tile list, via the left-side drag handle. Mirrors
-  // AnalysisScreen's "통계 구성" drag pattern. sectionOrderRef always tracks the
-  // latest sectionOrder so the cached PanResponders never read a stale array.
-  const sectionOrderRef = useRef(sectionOrder);
-  useEffect(() => {
-    sectionOrderRef.current = sectionOrder;
-  }, [sectionOrder]);
+  // Drag-to-reorder for the tile list, via the left-side drag handle.
+  const { dragKey, dragY, getDragResponder } = useDragReorder(
+    sectionOrder, setSectionOrder, TILE_ROW_HEIGHT, SECTION_ORDER_KEY
+  );
 
-  const [dragKey, setDragKey] = useState(null);
-  const dragY = useRef(new Animated.Value(0)).current;
-  const dragStartIndexRef = useRef(0);
-  const dragResponders = useRef({}).current;
-
-  const getDragResponder = (key) => {
-    if (!dragResponders[key]) {
-      dragResponders[key] = PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: () => {
-          dragStartIndexRef.current = sectionOrderRef.current.indexOf(key);
-          setDragKey(key);
-          dragY.setValue(0);
-        },
-        onPanResponderMove: (evt, gestureState) => {
-          const fromIndex = dragStartIndexRef.current;
-          const shift = Math.round(gestureState.dy / TILE_ROW_HEIGHT);
-          const toIndex = Math.min(Math.max(fromIndex + shift, 0), sectionOrderRef.current.length - 1);
-          const currentIndex = sectionOrderRef.current.indexOf(key);
-          if (toIndex !== currentIndex) {
-            const next = [...sectionOrderRef.current];
-            next.splice(currentIndex, 1);
-            next.splice(toIndex, 0, key);
-            sectionOrderRef.current = next;
-            setSectionOrder(next);
-          }
-          // Compensate for the row's own flow-position shift so it keeps
-          // tracking the finger smoothly instead of jumping on each reorder.
-          dragY.setValue(gestureState.dy - (toIndex - fromIndex) * TILE_ROW_HEIGHT);
-        },
-        onPanResponderRelease: () => {
-          setDragKey(null);
-          dragY.setValue(0);
-          storage.setItem(SECTION_ORDER_KEY, sectionOrderRef.current);
-        },
-        onPanResponderTerminate: () => {
-          setDragKey(null);
-          dragY.setValue(0);
-        },
-      });
-    }
-    return dragResponders[key];
-  };
-
-  const title = getAchievementTitle(logs, myTeam);
-  const achievements = getAchievements(logs, myTeam, goods, goodsLogLinks);
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
-  const k1Stamped = getStampedStadiumKeys(logs, getBingoGrid('k1', myTeam, 0)).size;
-  const k2Stamped = getStampedStadiumKeys(logs, getBingoGrid('k2', myTeam, 0)).size;
+  const title = useMemo(() => getAchievementTitle(logs, myTeam), [logs, myTeam]);
+  const achievements = useMemo(
+    () => getAchievements(logs, myTeam, goods, goodsLogLinks),
+    [logs, myTeam, goods, goodsLogLinks]
+  );
+  const unlockedCount = useMemo(() => achievements.filter((a) => a.unlocked).length, [achievements]);
+  const k1Stamped = useMemo(
+    () => getStampedStadiumKeys(logs, getBingoGrid('k1', myTeam, 0)).size,
+    [logs, myTeam]
+  );
+  const k2Stamped = useMemo(
+    () => getStampedStadiumKeys(logs, getBingoGrid('k2', myTeam, 0)).size,
+    [logs, myTeam]
+  );
   const teamShortLabel = getTeamShortLabel(myTeam);
 
   if (settingsVisible) {
@@ -171,6 +136,8 @@ export default function MyPageScreen({
         onSetCustomAccent={onSetCustomAccent}
         isPremium={isPremium}
         onSetIsPremium={onSetIsPremium}
+        adFreeUntil={adFreeUntil}
+        onSetAdFreeUntil={onSetAdFreeUntil}
       />
     );
   }
@@ -197,6 +164,8 @@ export default function MyPageScreen({
         theme={theme}
         logs={logs}
         myTeam={myTeam}
+        goods={goods}
+        goodsLogLinks={goodsLogLinks}
         onBack={() => setActiveSubScreen(null)}
       />
     );
@@ -307,6 +276,7 @@ export default function MyPageScreen({
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: activeColors.bgBody }}>
+      <AdBanner hidden={isAdFree} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Profile Header Card */}
         <View style={[styles.headerCard, { backgroundColor: activeColors.brandNavy }]}>

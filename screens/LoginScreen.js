@@ -10,6 +10,7 @@ import {
 import { Colors } from '../constants/Colors';
 import { signInWithKakao } from '../utils/auth';
 import { showAlert } from '../utils/appAlert';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen({ theme = 'light', onLoggedIn }) {
   const activeColors = Colors[theme];
@@ -32,7 +33,16 @@ export default function LoginScreen({ theme = 'light', onLoggedIn }) {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: activeColors.bgBody }]}>
       <View style={styles.content}>
-        <Text style={[styles.title, { color: activeColors.brandNavy }]}>K리그 직관일지</Text>
+        <View style={styles.emblemWrap}>
+          <View style={[styles.emblemRing, { borderColor: activeColors.brandRed }]} />
+          <View style={[styles.emblem, { backgroundColor: activeColors.brandNavy }]}>
+            <Ionicons name="football" size={38} color="#ffffff" />
+          </View>
+        </View>
+
+        <Text style={[styles.title, { color: activeColors.brandNavy }]}>또직관</Text>
+        <Text style={[styles.tagline, { color: activeColors.textMuted }]}>K-LEAGUE MATCH DIARY</Text>
+
         <Text style={[styles.subtitle, { color: activeColors.textMuted }]}>
           카카오 계정으로 로그인하고{'\n'}나만의 직관 기록을 시작해 보세요!
         </Text>
@@ -64,11 +74,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
   },
+  emblemWrap: {
+    width: 96,
+    height: 96,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emblemRing: {
+    position: 'absolute',
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 2,
+    opacity: 0.4,
+  },
+  emblem: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: '900',
     letterSpacing: -0.5,
-    marginBottom: 12,
+  },
+  tagline: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 2.5,
+    marginTop: 6,
+    marginBottom: 28,
   },
   subtitle: {
     fontSize: 13,

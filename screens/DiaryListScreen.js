@@ -11,23 +11,32 @@ import {
   Dimensions,
   TextInput,
   Animated,
-  PanResponder,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';
 import { LEAGUE_TEAMS } from '../constants/TeamData';
+import { calculateOutcome } from '../utils/achievements';
 import { getRefereeStatus } from '../utils/refereeStatus';
+import { formatWon } from '../utils/format';
+import { storage } from '../utils/storage';
+import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
 import { showAlert } from '../utils/appAlert';
+import AdBanner from '../components/AdBanner';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
+
+const VIEW_MODE_KEY = 'kleague_diarylist_viewmode';
 
 export default function DiaryListScreen({
   theme = 'light',
   logs = [],
   expenses = [],
   myTeam,
+  goods = [],
+  goodsLogLinks = [],
+  isAdFree = false,
   onDeleteLog,
   onOpenWriteForm,
   writeAutofill,
@@ -48,31 +57,16 @@ export default function DiaryListScreen({
     setPhotoIndex(0);
   }, [selectedLog?.id]);
 
-  const filterTranslateY = React.useRef(new Animated.Value(0)).current;
-  const filterPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          filterTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setFilterVisible(false);
-          setTimeout(() => {
-            filterTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(filterTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  // Restore the last-chosen view mode so it survives switching tabs and back,
+  // instead of always resetting to '기본모드' on remount.
+  useEffect(() => {
+    storage.getItem(VIEW_MODE_KEY, 'large').then((saved) => {
+      if (saved) setViewMode(saved);
+    });
+  }, []);
+
+  const { translateY: filterTranslateY, panResponder: filterPanResponder } =
+    useSwipeDismissModal(() => setFilterVisible(false));
   
   // Filter States
   const [filterTeam, setFilterTeam] = useState('all');
@@ -115,35 +109,6 @@ export default function DiaryListScreen({
 
   const activeColors = Colors[theme];
 
-  // Helper to determine match outcome relative to myTeam
-  const calculateOutcome = (log) => {
-    const home = log.homeTeam.trim();
-    const away = log.awayTeam.trim();
-    const homeScore = parseInt(log.homeScore);
-    const awayScore = parseInt(log.awayScore);
-
-    if (isNaN(homeScore) || isNaN(awayScore)) return '무';
-
-    const cleanMyTeam = myTeam.trim();
-    const isHome = home === cleanMyTeam;
-    const isAway = away === cleanMyTeam;
-
-    if (!isHome && !isAway) {
-      // Neutral match
-      if (homeScore > awayScore) return '승';
-      if (homeScore < awayScore) return '패';
-      return '무';
-    }
-
-    if (homeScore === awayScore) return '무';
-
-    if (isHome) {
-      return homeScore > awayScore ? '승' : '패';
-    } else {
-      return awayScore > homeScore ? '승' : '패';
-    }
-  };
-
   // Filter & Sort Logic
   const getFilteredLogs = () => {
     let result = [...logs];
@@ -158,7 +123,7 @@ export default function DiaryListScreen({
     // 2. Outcome Filter
     if (filterOutcome !== 'all') {
       result = result.filter((log) => {
-        const outcome = calculateOutcome(log);
+        const outcome = calculateOutcome(log, myTeam);
         if (filterOutcome === 'win') return outcome === '승';
         if (filterOutcome === 'draw') return outcome === '무';
         if (filterOutcome === 'lose') return outcome === '패';
@@ -235,6 +200,8 @@ export default function DiaryListScreen({
         </TouchableOpacity>
       </View>
 
+      <AdBanner hidden={isAdFree} />
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {filteredLogs.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -250,7 +217,7 @@ export default function DiaryListScreen({
           </View>
         ) : (
           filteredLogs.map((log) => {
-            const outcome = calculateOutcome(log);
+            const outcome = calculateOutcome(log, myTeam);
 
             if (viewMode === 'simplified') {
               // Simplified View mode (Image 1 layout)
@@ -302,7 +269,7 @@ export default function DiaryListScreen({
                         <Text style={styles.simOutcomeBadgeText}>{outcome}</Text>
                       </View>
                     </View>
-                    <Text style={styles.simStarsText}>⭐ {log.rating}</Text>
+                    <Text style={[styles.simStarsText, { color: activeColor }]}>⭐ {log.rating}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -427,7 +394,7 @@ export default function DiaryListScreen({
               >
                 {/* Top Row: Rating text stars & Outcome Badge */}
                 <View style={[styles.cardHeaderRow, { borderBottomColor: activeColors.dividerColor }]}>
-                  <Text style={[styles.ratingTextLabel, { color: activeColors.textBody }]}>
+                  <Text style={[styles.ratingTextLabel, { color: activeColor }]}>
                     ⭐ 직관경험: {'★'.repeat(log.rating)}{'☆'.repeat(5 - log.rating)}
                   </Text>
                   <View style={[
@@ -658,7 +625,7 @@ export default function DiaryListScreen({
                       <Text style={[
                         styles.teamFilterGridCellText,
                         { color: isActive ? activeTextColor : activeColors.textBody },
-                        isAll && { textAlign: 'center', fontWeight: '950', flex: 1 }
+                        isAll && { textAlign: 'center', fontWeight: '900', flex: 1 }
                       ]} numberOfLines={1}>
                         {isAll ? '전체' : teamName.replace(' FC', '')}
                       </Text>
@@ -694,6 +661,7 @@ export default function DiaryListScreen({
                 ]}
                 onPress={() => {
                   setViewMode(tempViewMode);
+                  storage.setItem(VIEW_MODE_KEY, tempViewMode);
                   setFilterOutcome(tempFilterOutcome);
                   setFilterTeam(tempFilterTeam);
                   setFilterLeagueTab(tempFilterLeagueTab);
@@ -827,7 +795,7 @@ export default function DiaryListScreen({
                       
                       {/* Outcome Badge */}
                       {(() => {
-                        const outcome = calculateOutcome(selectedLog);
+                        const outcome = calculateOutcome(selectedLog, myTeam);
                         const isWin = outcome === '승';
                         const isLose = outcome === '패';
                         return (
@@ -884,7 +852,7 @@ export default function DiaryListScreen({
                           key={i}
                           name={i < selectedLog.rating ? 'star' : 'star-outline'}
                           size={24}
-                          color="#FBC02D"
+                          color={activeColor}
                           style={{ marginRight: 6 }}
                         />
                       ))}
@@ -923,24 +891,54 @@ export default function DiaryListScreen({
                             💵 이날의 소비 지출
                           </Text>
                           <Text style={[styles.detailSpendingTotalText, { color: activeColors.brandNavy }]}>
-                            {totalSpent.toLocaleString()}원
+                            {formatWon(totalSpent)}
                           </Text>
                         </View>
                         <View style={[styles.detailSpendingDivider, { backgroundColor: activeColors.dividerColor }]} />
                         {logExpenses.map((e) => {
-                          const emoji = e.category === 'ticket' ? '🎫' : e.category === 'food' ? '🍔' : e.category === 'transport' ? '🚌' : '🛍️';
-                          const label = e.category === 'ticket' ? '티켓' : e.category === 'food' ? '식음료' : e.category === 'transport' ? '교통' : '굿즈/기타';
+                          const emoji = e.category === 'ticket' ? '🎫' : e.category === 'food' ? '🍔' : e.category === 'transport' ? '🚌' : e.category === 'goods' ? '🛍️' : '💰';
+                          const label = e.category === 'ticket' ? '티켓' : e.category === 'food' ? '식음료' : e.category === 'transport' ? '교통' : e.category === 'goods' ? '굿즈' : '기타';
                           return (
                             <View key={e.id} style={styles.detailSpendingRow}>
                               <Text style={[styles.detailSpendingRowLabel, { color: activeColors.textBody }]}>
                                 {emoji} {label} | {e.memo || label}
                               </Text>
                               <Text style={[styles.detailSpendingRowAmount, { color: activeColors.brandNavy }]}>
-                                {e.amount.toLocaleString()}원
+                                {formatWon(e.amount)}
                               </Text>
                             </View>
                           );
                         })}
+                      </View>
+                    );
+                  })()}
+
+                  {/* Worn Goods Card */}
+                  {(() => {
+                    const wornGoods = goodsLogLinks
+                      .filter((l) => l.diary_log_id === selectedLog.id)
+                      .map((l) => goods.find((g) => g.id === l.goods_id))
+                      .filter(Boolean);
+                    if (wornGoods.length === 0) return null;
+                    return (
+                      <View style={[styles.detailCard, { backgroundColor: activeColors.bgCard, borderColor: activeColors.borderColor }]}>
+                        <Text style={[styles.detailCardLabel, { color: activeColors.brandNavy }]}>👕 착용한 굿즈</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                          {wornGoods.map((item) => (
+                            <View key={item.id} style={styles.detailGoodsChip}>
+                              {item.photo_url ? (
+                                <Image source={{ uri: item.photo_url }} style={styles.detailGoodsChipImage} />
+                              ) : (
+                                <View style={[styles.detailGoodsChipImage, styles.detailGoodsChipPlaceholder, { backgroundColor: activeColors.bgTag }]}>
+                                  <Ionicons name="shirt-outline" size={14} color={activeColors.textMuted} />
+                                </View>
+                              )}
+                              <Text style={{ fontSize: 12, fontWeight: '700', color: activeColors.textBody, maxWidth: 90 }} numberOfLines={1}>
+                                {item.name}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
                       </View>
                     );
                   })()}
@@ -1143,7 +1141,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 16,
-    fontWeight: '950',
+    fontWeight: '900',
     alignSelf: 'center',
     marginBottom: 15,
   },
@@ -1333,13 +1331,13 @@ const styles = StyleSheet.create({
   },
   detailTeamName: {
     fontSize: 12.5,
-    fontWeight: '950',
+    fontWeight: '900',
     marginTop: 6,
     textAlign: 'center',
   },
   detailScoreText: {
     fontSize: 26,
-    fontWeight: '950',
+    fontWeight: '900',
     letterSpacing: 2,
     flex: 1,
     textAlign: 'center',
@@ -1348,6 +1346,25 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     fontWeight: '900',
     marginBottom: 10,
+  },
+  detailGoodsChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  detailGoodsChipImage: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+  },
+  detailGoodsChipPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailStarsRow: {
     flexDirection: 'row',
@@ -1360,7 +1377,7 @@ const styles = StyleSheet.create({
   },
   detailSpendingTotalText: {
     fontSize: 14,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   detailSpendingDivider: {
     height: 1,
@@ -1388,7 +1405,7 @@ const styles = StyleSheet.create({
   },
   ratingTextLabel: {
     fontSize: 12,
-    fontWeight: '850',
+    fontWeight: '800',
   },
   listTeamLeft: {
     flexDirection: 'row',
@@ -1421,7 +1438,7 @@ const styles = StyleSheet.create({
   listScoreText: {
     color: '#ffffff',
     fontSize: 13,
-    fontWeight: '950',
+    fontWeight: '900',
   },
   dashedDivider: {
     borderBottomWidth: 1.2,
@@ -1475,7 +1492,7 @@ const styles = StyleSheet.create({
   },
   simTeamText: {
     fontSize: 12,
-    fontWeight: '850',
+    fontWeight: '800',
     maxWidth: 45,
   },
   simScoreText: {
@@ -1528,7 +1545,7 @@ const styles = StyleSheet.create({
   feedPlaceholderText: {
     color: 'rgba(255,255,255,0.4)',
     fontSize: 11,
-    fontWeight: '850',
+    fontWeight: '800',
   },
   feedPhotoNavBtn: {
     position: 'absolute',
@@ -1647,7 +1664,7 @@ const styles = StyleSheet.create({
   },
   teamFilterGridCellText: {
     fontSize: 10.5,
-    fontWeight: '850',
+    fontWeight: '800',
     flex: 1,
   },
   filterResetBtn: {

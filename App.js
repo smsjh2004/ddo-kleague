@@ -17,9 +17,12 @@ import {
   getProfile,
   upsertProfile,
   deleteProfileRemote,
+  deleteAccountRemote,
   upsertDiaryLog,
+  listDiaryLogs,
   deleteDiaryLogRemote,
   upsertExpense,
+  listExpenses,
   deleteExpenseRemote,
   listGoods,
   listGoodsLogLinks,
@@ -32,9 +35,12 @@ import {
 import { signOut } from './utils/auth';
 import { getAchievements } from './utils/achievements';
 import { showAchievementUnlock } from './utils/achievementAlert';
+import { initAds } from './utils/ads';
+import AdBanner from './components/AdBanner';
 import { Colors, applyAccentColor } from './constants/Colors';
 import LoginScreen from './screens/LoginScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
+import TutorialScreen from './screens/TutorialScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import DiaryListScreen from './screens/DiaryListScreen';
 import DiaryWriteScreen from './screens/DiaryWriteScreen';
@@ -45,10 +51,6 @@ import AppAlertHost from './components/AppAlertHost';
 import AchievementModal from './components/AchievementModal';
 import { Ionicons } from '@expo/vector-icons';
 
-// TEMP: skips the Kakao login/onboarding gate for local testing.
-// Set back to false (or delete the two `!BYPASS_LOGIN_FOR_TESTING &&` checks below) before shipping.
-const BYPASS_LOGIN_FOR_TESTING = false;
-
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [nickname, setNickname] = useState('');
@@ -56,6 +58,7 @@ export default function App() {
   const [themeMode, setThemeModeState] = useState('system'); // system, light, dark
   const [customAccent, setCustomAccentState] = useState('');
   const [isPremium, setIsPremiumState] = useState(false);
+  const [adFreeUntil, setAdFreeUntilState] = useState(0);
   const [activeTab, setActiveTab] = useState('schedule'); // schedule, record, wallet, mypage
   const [recordSubTab, setRecordSubTab] = useState('list'); // list, analysis
   const [writeAutofill, setWriteAutofill] = useState(null);
@@ -72,12 +75,14 @@ export default function App() {
   const [goodsLogLinks, setGoodsLogLinksState] = useState([]);
   const [friends, setFriends] = useState([]);
   const [pendingFriendCode, setPendingFriendCode] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const systemScheme = useColorScheme();
   const theme = themeMode === 'system' ? (systemScheme || 'light') : themeMode;
   const activeColors = Colors[theme];
   const isDark = theme === 'dark';
   const activeTabColor = isDark ? activeColors.brandRed : activeColors.brandNavy;
+  const isAdFree = isPremium || adFreeUntil > Date.now();
 
   // Look up the profile row for a logged-in Kakao user (null if they haven't
   // finished onboarding yet).
@@ -92,14 +97,26 @@ export default function App() {
       setHasProfile(false);
     }
 
-    const [goodsList, goodsLinks, friendRows] = await Promise.all([
+    const [goodsList, goodsLinks, friendRows, logsList, expensesList] = await Promise.all([
       listGoods(userId),
       listGoodsLogLinks(userId),
       listFriends(userId),
+      listDiaryLogs(userId),
+      listExpenses(userId),
     ]);
     setGoods(goodsList || []);
     setGoodsLogLinksState(goodsLinks || []);
     setFriends((friendRows || []).map((r) => (r.requester_id === userId ? r.addressee : r.requester)).filter(Boolean));
+    // null means the fetch failed/offline - keep whatever's cached locally
+    // rather than wiping the screen; a successful fetch is the source of truth.
+    if (logsList) {
+      setLogs(logsList);
+      storage.setItem('kleague_logs', logsList);
+    }
+    if (expensesList) {
+      setExpenses(expensesList);
+      storage.setItem('kleague_expenses', expensesList);
+    }
   };
 
   // Kakao's profile photo shows up under different keys depending on how
@@ -116,6 +133,7 @@ export default function App() {
         const savedThemeMode = await storage.getItem('kleague_theme_mode', 'system');
         const savedAccent = await storage.getItem('kleague_custom_accent', '');
         const savedIsPremium = await storage.getItem('kleague_is_premium', false);
+        const savedAdFreeUntil = await storage.getItem('kleague_adfree_until', 0);
         const savedLogs = await storage.getItem('kleague_logs', []);
         const savedExpenses = await storage.getItem('kleague_expenses', []);
 
@@ -135,8 +153,10 @@ export default function App() {
         setCustomAccentState(savedAccent);
         applyAccentColor(savedAccent);
         setIsPremiumState(savedIsPremium || false);
+        setAdFreeUntilState(savedAdFreeUntil || 0);
         setLogs(savedLogs);
         setExpenses(savedExpenses);
+        initAds();
 
         if (supabase) {
           const { data: { session: currentSession } } = await supabase.auth.getSession();
@@ -207,6 +227,7 @@ export default function App() {
         await upsertProfile(session.user.id, { ...selections, avatarUrl: chosenAvatarUrl });
         setAvatarUrl(chosenAvatarUrl);
         setHasProfile(true);
+        setShowTutorial(true);
       }
     } catch (err) {
       console.error('Failed to save onboarding data:', err);
@@ -368,6 +389,11 @@ export default function App() {
     await storage.setItem('kleague_is_premium', value);
   };
 
+  const setAdFreeUntil = async (value) => {
+    setAdFreeUntilState(value);
+    await storage.setItem('kleague_adfree_until', value);
+  };
+
   const handleLogout = async () => {
     setIsLoading(true);
     await signOut();
@@ -383,14 +409,16 @@ export default function App() {
     setIsLoading(false);
   };
 
-  // Deletes the profile row (cascades to diary_logs/expenses/goods server-side,
-  // see supabase/schema.sql), then signs out. The underlying auth.users row
-  // itself can't be removed from the client - that needs a service-role Edge
-  // Function - so this is "erase all app data + sign out", not a full account purge.
+  // Full account purge: the delete-account Edge Function removes the
+  // auth.users row, and profiles/diary_logs/expenses/goods all cascade off it
+  // (see supabase/schema.sql). If that call fails - function not deployed yet,
+  // no network - fall back to deleting the profile row, which still wipes
+  // every piece of user data the client can reach.
   const handleWithdraw = async () => {
     setIsLoading(true);
     if (session) {
-      await deleteProfileRemote(session.user.id);
+      const purged = await deleteAccountRemote();
+      if (!purged) await deleteProfileRemote(session.user.id);
     }
     await signOut();
     await storage.clear();
@@ -414,7 +442,7 @@ export default function App() {
   }
 
   // Not logged in yet - show Kakao login
-  if (!BYPASS_LOGIN_FOR_TESTING && !session) {
+  if (!session) {
     return (
       <>
         <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
@@ -425,7 +453,7 @@ export default function App() {
   }
 
   // Logged in but hasn't picked a team/nickname yet
-  if (!BYPASS_LOGIN_FOR_TESTING && !hasProfile) {
+  if (!hasProfile) {
     return (
       <>
         <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
@@ -439,6 +467,18 @@ export default function App() {
     );
   }
 
+  // First-time signup only - a short swipeable walkthrough of core features
+  // before landing in the main app shell.
+  if (showTutorial) {
+    return (
+      <>
+        <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+        <TutorialScreen theme={theme} onFinish={() => setShowTutorial(false)} />
+        <AppAlertHost theme={theme} />
+      </>
+    );
+  }
+
   // Render main app layout with tabs mock shell
   const getTabTitle = () => {
     switch (activeTab) {
@@ -446,7 +486,7 @@ export default function App() {
       case 'record': return '나의 직관';
       case 'wallet': return '나의 지출';
       case 'mypage': return '마이페이지';
-      default: return 'K리그 직관일지';
+      default: return '또직관';
     }
   };
 
@@ -488,6 +528,7 @@ export default function App() {
             logs={logs}
             myTeam={myTeam}
             schedule={schedule}
+            isAdFree={isAdFree}
             onWriteDiary={(matchDetails) => {
               setWriteAutofill(matchDetails);
               setActiveTab('record');
@@ -515,6 +556,7 @@ export default function App() {
               existingExpenses={expenses.filter((e) => e.matchId === editingLog?.id)}
               goods={goods}
               existingGoodsIds={goodsLogLinks.filter((l) => l.diary_log_id === editingLog?.id).map((l) => l.goods_id)}
+              onSaveGoods={handleSaveGoodsItem}
               isPremium={isPremium}
               friends={friends}
             />
@@ -546,6 +588,9 @@ export default function App() {
                   logs={logs}
                   expenses={expenses}
                   myTeam={myTeam}
+                  isAdFree={isAdFree}
+                  goods={goods}
+                  goodsLogLinks={goodsLogLinks}
                   onDeleteLog={handleDeleteLog}
                   onOpenWriteForm={() => setIsWriting(true)}
                   focusedLogId={focusedLogId}
@@ -570,6 +615,7 @@ export default function App() {
             theme={theme}
             expenses={expenses}
             logs={logs}
+            isAdFree={isAdFree}
             onSaveExpense={handleSaveExpense}
             onDeleteExpense={handleDeleteExpense}
           />
@@ -594,6 +640,9 @@ export default function App() {
             onSetCustomAccent={setCustomAccent}
             isPremium={isPremium}
             onSetIsPremium={setIsPremium}
+            adFreeUntil={adFreeUntil}
+            onSetAdFreeUntil={setAdFreeUntil}
+            isAdFree={isAdFree}
             userId={session?.user?.id}
             pendingFriendCode={pendingFriendCode}
             onConsumeFriendCode={() => setPendingFriendCode(null)}

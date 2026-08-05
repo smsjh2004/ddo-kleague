@@ -11,7 +11,6 @@ import {
   Dimensions,
   Image,
   Animated,
-  PanResponder,
   Switch,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,8 +18,10 @@ import { LEAGUE_TEAMS, TEAM_STADIUMS } from '../constants/TeamData';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';
 import { getRefereeStatus } from '../utils/refereeStatus';
-import { getTodayString } from '../utils/date';
+import { getTodayString, buildMonthGrid } from '../utils/date';
+import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
 import { showAlert } from '../utils/appAlert';
+import GoodsModal from './GoodsModal';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -35,10 +36,12 @@ export default function DiaryWriteScreen({
   existingExpenses,
   goods = [],
   existingGoodsIds = [],
+  onSaveGoods,
   isPremium = false,
   friends = [],
 }) {
   const [step, setStep] = useState(1);
+  const [newGoodsModalVisible, setNewGoodsModalVisible] = useState(false);
   
   // Form State
   const [homeScore, setHomeScore] = useState('0');
@@ -73,10 +76,6 @@ export default function DiaryWriteScreen({
   const [weather, setWeather] = useState('☀️맑음');
   const [selectedGoodsIds, setSelectedGoodsIds] = useState([]);
   const [goodsPickerVisible, setGoodsPickerVisible] = useState(false);
-  // Reusing the same goods picker modal for expense entries - when set, tapping
-  // an item links it to that one expense entry (single-select) instead of
-  // toggling the diary-wide "착용한 굿즈" multi-select.
-  const [expenseGoodsTargetId, setExpenseGoodsTargetId] = useState(null);
   const [refereeScore, setRefereeScore] = useState(50);
   const [sliderWidth, setSliderWidth] = useState(250);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -97,10 +96,7 @@ export default function DiaryWriteScreen({
   const renderPickerCalendarCells = () => {
     const year = pickerCalendarDate.getFullYear();
     const month = pickerCalendarDate.getMonth();
-    const firstDayIndex = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month + 1, 0).getDate();
-    const prevLastDate = new Date(year, month, 0).getDate();
-    const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
+    const { firstDayIndex, lastDate, prevLastDate, monthStr } = buildMonthGrid(year, month);
 
     const cells = [];
 
@@ -127,19 +123,22 @@ export default function DiaryWriteScreen({
             aspectRatio: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            borderRadius: 8,
-            backgroundColor: isSelected ? activeColors.brandRed : 'transparent',
           }}
           onPress={() => {
             setDate(dayStr);
             setDatePickerVisible(false);
           }}
         >
-          <Text style={{
-            fontSize: 12,
-            fontWeight: '700',
-            color: isSelected ? '#ffffff' : activeColors.textBody,
-          }}>{i}</Text>
+          {/* Fixed-size circle so the highlight stays round on any screen
+              width - a radius on the percentage-width cell itself only looks
+              circular on narrow viewports. */}
+          <View style={[styles.pickerDayCircle, isSelected && { backgroundColor: activeColors.brandRed }]}>
+            <Text style={{
+              fontSize: 12,
+              fontWeight: '700',
+              color: isSelected ? '#ffffff' : activeColors.textBody,
+            }}>{i}</Text>
+          </View>
         </TouchableOpacity>
       );
     }
@@ -156,13 +155,15 @@ export default function DiaryWriteScreen({
     ticket: '티켓 예매',
     food: '푸드트럭/식음료',
     transport: '교통비/주차비',
-    goods: 'MD/굿즈/기타',
+    goods: 'MD/굿즈',
+    etc: '기타 지출',
   };
   const EXPENSE_CATEGORY_META = [
-    { key: 'ticket', label: '티켓', emoji: '🎫', memoPlaceholder: '메모 (예: E석 예매, 원정석 등)' },
-    { key: 'food', label: '식음료', emoji: '🍔', memoPlaceholder: '메모 (예: 푸드트럭 닭강정, 편의점 맥주 등)' },
-    { key: 'transport', label: '교통/주차', emoji: '🚌', memoPlaceholder: '메모 (예: KTX 왕복, 주차정산 등)' },
-    { key: 'goods', label: '굿즈/기타', emoji: '🛍️', memoPlaceholder: '메모 (예: 유니폼 마킹, 머플러 등)' },
+    { key: 'ticket', label: '티켓', emoji: '🎫', memoPlaceholder: '예: E석 예매' },
+    { key: 'food', label: '식음료', emoji: '🍔', memoPlaceholder: '예: 닭강정, 맥주' },
+    { key: 'transport', label: '교통/주차', emoji: '🚌', memoPlaceholder: '예: KTX 왕복' },
+    { key: 'goods', label: '굿즈', emoji: '🛍️', memoPlaceholder: '예: 유니폼 마킹' },
+    { key: 'etc', label: '기타', emoji: '💰', memoPlaceholder: '예: 팬미팅 참가비' },
   ];
 
   const addExpenseEntry = (category) => {
@@ -184,57 +185,11 @@ export default function DiaryWriteScreen({
   const [pickerTarget, setPickerTarget] = useState(null); // 'home' or 'away'
   const [pickerDivision, setPickerDivision] = useState('all'); // all, k1, k2
 
-  const teamTranslateY = React.useRef(new Animated.Value(0)).current;
-  const teamPanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          teamTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setPickerVisible(false);
-          setTimeout(() => {
-            teamTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(teamTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const { translateY: teamTranslateY, panResponder: teamPanResponder } =
+    useSwipeDismissModal(() => setPickerVisible(false));
 
-  const dateTranslateY = React.useRef(new Animated.Value(0)).current;
-  const datePanResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) {
-          dateTranslateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dy > 20 || gestureState.vy > 0.2) {
-          setDatePickerVisible(false);
-          setTimeout(() => {
-            dateTranslateY.setValue(0);
-          }, 300);
-        } else {
-          Animated.spring(dateTranslateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const { translateY: dateTranslateY, panResponder: datePanResponder } =
+    useSwipeDismissModal(() => setDatePickerVisible(false));
 
   const activeColors = Colors[theme];
   const isDark = theme === 'dark';
@@ -767,6 +722,13 @@ export default function DiaryWriteScreen({
 
                         {isOpen && (
                           <View style={{ padding: 6, marginTop: 6, borderRadius: 8, borderWidth: 1.5, backgroundColor: activeColors.bgCard, borderColor: activeColors.borderColor }}>
+                            {friends.length === 0 && (
+                              <View style={{ paddingVertical: 10, paddingHorizontal: 8 }}>
+                                <Text style={{ fontSize: 12, fontWeight: '700', color: activeColors.textMuted, lineHeight: 17 }}>
+                                  아직 추가된 친구가 없어요.{'\n'}마이페이지에서 친구를 추가해보세요!
+                                </Text>
+                              </View>
+                            )}
                             {availableFriends.map((f) => (
                               <TouchableOpacity
                                 key={f.id}
@@ -800,10 +762,22 @@ export default function DiaryWriteScreen({
 
                   <TouchableOpacity
                     onPress={addCompanionSlot}
-                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      height: 44,
+                      borderRadius: 10,
+                      borderWidth: 1.5,
+                      borderStyle: 'dashed',
+                      borderColor: activeColors.brandRed,
+                      backgroundColor: 'rgba(238, 50, 36, 0.05)',
+                    }}
+                    activeOpacity={0.7}
                   >
-                    <Ionicons name="add-circle-outline" size={16} color={activeColors.brandRed} />
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: activeColors.brandRed }}>
+                    <Ionicons name="person-add-outline" size={16} color={activeColors.brandRed} />
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: activeColors.brandRed }}>
                       동행 친구 추가
                     </Text>
                   </TouchableOpacity>
@@ -824,12 +798,23 @@ export default function DiaryWriteScreen({
               )}
             </View>
 
-            {/* Worn Goods - only shown once the user has registered goods. Picking
-                happens in a modal styled like the 굿즈보관함 grid (image + name)
-                so the user can see what each item actually looks like. */}
-            {goods.length > 0 && (
-              <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: activeColors.textBody, marginBottom: 8 }]}>착용한 굿즈 (선택)</Text>
+            {/* Worn Goods - picking happens in a modal styled like the
+                굿즈보관함 grid (image + name) so the user can see what each
+                item actually looks like. If nothing's registered yet, a
+                button opens the same add-goods form used in 마이페이지 so the
+                user isn't forced to leave the diary flow to register one. */}
+            <View style={styles.inputGroup}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                  <Ionicons name="shirt-outline" size={15} color={activeColors.brandRed} />
+                  <Text style={[styles.inputLabel, { color: activeColors.textBody, marginBottom: 0 }]}>착용한 굿즈 (선택)</Text>
+                </View>
+                <View style={{ borderWidth: 1.5, borderRadius: 10, padding: 12, backgroundColor: activeColors.bgCard, borderColor: activeColors.borderColor }}>
+
+                {goods.length === 0 && (
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: activeColors.textMuted, marginBottom: 10 }}>
+                    등록된 굿즈가 없어요. 먼저 굿즈를 등록해보세요!
+                  </Text>
+                )}
 
                 {selectedGoodsIds.length > 0 && (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
@@ -854,28 +839,40 @@ export default function DiaryWriteScreen({
                 )}
 
                 <TouchableOpacity
-                  onPress={() => setGoodsPickerVisible(true)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
+                  onPress={() => (goods.length > 0 ? setGoodsPickerVisible(true) : setNewGoodsModalVisible(true))}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    height: 44,
+                    borderRadius: 10,
+                    borderWidth: 1.5,
+                    borderStyle: 'dashed',
+                    borderColor: activeColors.brandRed,
+                    backgroundColor: 'rgba(238, 50, 36, 0.05)',
+                  }}
+                  activeOpacity={0.7}
                 >
                   <Ionicons name="add-circle-outline" size={16} color={activeColors.brandRed} />
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: activeColors.brandRed }}>
-                    굿즈 보관함에서 선택
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: activeColors.brandRed }}>
+                    {goods.length > 0 ? '굿즈 보관함에서 선택' : '굿즈 등록하기'}
                   </Text>
                 </TouchableOpacity>
+                </View>
               </View>
-            )}
 
             <Modal
               visible={goodsPickerVisible}
               animationType="slide"
-              onRequestClose={() => { setGoodsPickerVisible(false); setExpenseGoodsTargetId(null); }}
+              onRequestClose={() => setGoodsPickerVisible(false)}
             >
               <SafeAreaView style={{ flex: 1, backgroundColor: activeColors.bgBody }}>
                 <View style={[styles.goodsPickerHeader, { backgroundColor: activeColors.bgApp, borderBottomColor: activeColors.borderColor }]}>
                   <View style={styles.goodsPickerHeaderBtn} />
                   <Text style={[styles.goodsPickerHeaderTitle, { color: activeColors.brandNavy }]}>굿즈 보관함</Text>
                   <TouchableOpacity
-                    onPress={() => { setGoodsPickerVisible(false); setExpenseGoodsTargetId(null); }}
+                    onPress={() => setGoodsPickerVisible(false)}
                     style={styles.goodsPickerHeaderBtn}
                   >
                     <Ionicons name="close" size={22} color={activeColors.textBody} />
@@ -884,27 +881,16 @@ export default function DiaryWriteScreen({
                 <ScrollView contentContainerStyle={{ padding: 16 }}>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                     {goods.map((item) => {
-                      const targetEntry = expenseGoodsTargetId
-                        ? expenseEntries.find((e) => e.id === expenseGoodsTargetId)
-                        : null;
-                      const isActive = expenseGoodsTargetId
-                        ? targetEntry?.goodsId === item.id
-                        : selectedGoodsIds.includes(item.id);
+                      const isActive = selectedGoodsIds.includes(item.id);
                       return (
                         <TouchableOpacity
                           key={item.id}
                           style={styles.goodsGridItem}
                           activeOpacity={0.8}
                           onPress={() => {
-                            if (expenseGoodsTargetId) {
-                              updateExpenseEntry(expenseGoodsTargetId, 'goodsId', isActive ? null : item.id);
-                              setGoodsPickerVisible(false);
-                              setExpenseGoodsTargetId(null);
-                            } else {
-                              setSelectedGoodsIds((prev) =>
-                                prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id]
-                              );
-                            }
+                            setSelectedGoodsIds((prev) =>
+                              prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id]
+                            );
                           }}
                         >
                           <View style={[styles.goodsGridImageWrap, { borderColor: isActive ? activeColors.brandRed : activeColors.borderColor }]}>
@@ -929,18 +915,28 @@ export default function DiaryWriteScreen({
                     })}
                   </View>
                 </ScrollView>
-                {!expenseGoodsTargetId && (
-                  <View style={{ padding: 16 }}>
-                    <TouchableOpacity
-                      style={[styles.nextBtn, { backgroundColor: activeColors.brandNavy }]}
-                      onPress={() => setGoodsPickerVisible(false)}
-                    >
-                      <Text style={styles.nextBtnText}>완료 ({selectedGoodsIds.length}개 선택)</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+                <View style={{ padding: 16 }}>
+                  <TouchableOpacity
+                    style={[styles.nextBtn, { backgroundColor: activeColors.brandNavy }]}
+                    onPress={() => setGoodsPickerVisible(false)}
+                  >
+                    <Text style={styles.nextBtnText}>완료 ({selectedGoodsIds.length}개 선택)</Text>
+                  </TouchableOpacity>
+                </View>
               </SafeAreaView>
             </Modal>
+
+            <GoodsModal
+              visible={newGoodsModalVisible}
+              onClose={() => setNewGoodsModalVisible(false)}
+              theme={theme}
+              editingGoods={null}
+              onSave={(goodsItem) => {
+                if (onSaveGoods) onSaveGoods(goodsItem, []);
+                setSelectedGoodsIds((prev) => [...prev, goodsItem.id]);
+                setNewGoodsModalVisible(false);
+              }}
+            />
 
             {/* Referee Evaluation Slider */}
             <View style={{ marginTop: 24, paddingVertical: 12 }}>
@@ -1194,64 +1190,34 @@ export default function DiaryWriteScreen({
                     <Text style={[styles.rowLabelText, { color: activeColors.brandNavy }]}>{cat.emoji} {cat.label} 지출</Text>
                     {entries.map((entry, idx) => (
                       <View key={entry.id} style={[styles.integratedExpenseRow, { borderColor: activeColors.borderColor, backgroundColor: activeColors.bgCard }]}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <View style={styles.integratedExpenseRowLine}>
                           <TextInput
-                            style={[styles.integratedInput, { flex: 1, backgroundColor: activeColors.bgInput, borderColor: activeColors.borderColor, color: activeColors.textBody }]}
+                            style={[styles.integratedInput, { flex: 0.8, minWidth: 0, backgroundColor: activeColors.bgInput, borderColor: activeColors.borderColor, color: activeColors.textBody }]}
                             keyboardType="numeric"
-                            placeholder={`${cat.label} 금액 (원) *`}
+                            placeholder={`${cat.label} 금액 *`}
                             placeholderTextColor={activeColors.textMuted}
                             value={entry.amount}
                             onChangeText={(t) => updateExpenseEntry(entry.id, 'amount', t)}
                           />
                           <TextInput
-                            style={[styles.integratedInput, { flex: 1.4, backgroundColor: activeColors.bgInput, borderColor: activeColors.borderColor, color: activeColors.textBody }]}
+                            style={[styles.integratedInput, { flex: 1, minWidth: 0, backgroundColor: activeColors.bgInput, borderColor: activeColors.borderColor, color: activeColors.textBody }]}
                             placeholder={cat.memoPlaceholder}
                             placeholderTextColor={activeColors.textMuted}
                             value={entry.memo}
                             onChangeText={(t) => updateExpenseEntry(entry.id, 'memo', t)}
                           />
-                          {entries.length > 1 && (
-                            <TouchableOpacity onPress={() => removeExpenseEntry(entry.id)} style={{ padding: 4 }}>
+                          {entries.length > 1 ? (
+                            <TouchableOpacity
+                              onPress={() => removeExpenseEntry(entry.id)}
+                              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                              style={styles.integratedExpenseDeleteBtn}
+                            >
                               <Ionicons name="close-circle" size={20} color={activeColors.textMuted} />
                             </TouchableOpacity>
+                          ) : (
+                            <View style={styles.integratedExpenseDeleteBtn} />
                           )}
                         </View>
-
-                        {/* '굿즈' 카테고리 지출만 - 마이페이지 굿즈보관함에 등록된 아이템과 연결 (선택) */}
-                        {cat.key === 'goods' && (() => {
-                          const linkedGoods = goods.find((g) => g.id === entry.goodsId);
-                          return (
-                            <TouchableOpacity
-                              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }}
-                              onPress={() => {
-                                setExpenseGoodsTargetId(entry.id);
-                                setGoodsPickerVisible(true);
-                              }}
-                            >
-                              {linkedGoods ? (
-                                <>
-                                  {linkedGoods.photo_url ? (
-                                    <Image source={{ uri: linkedGoods.photo_url }} style={styles.selectedGoodsChipImage} />
-                                  ) : (
-                                    <View style={[styles.selectedGoodsChipImage, styles.goodsImagePlaceholder, { backgroundColor: activeColors.bgTag }]}>
-                                      <Ionicons name="shirt-outline" size={12} color={activeColors.textMuted} />
-                                    </View>
-                                  )}
-                                  <Text style={{ fontSize: 11.5, fontWeight: '700', color: activeColors.brandRed }} numberOfLines={1}>
-                                    {linkedGoods.name}
-                                  </Text>
-                                </>
-                              ) : (
-                                <>
-                                  <Ionicons name="link-outline" size={14} color={activeColors.textMuted} />
-                                  <Text style={{ fontSize: 11.5, fontWeight: '700', color: activeColors.textMuted }}>
-                                    굿즈보관함에서 연결 (선택)
-                                  </Text>
-                                </>
-                              )}
-                            </TouchableOpacity>
-                          );
-                        })()}
                       </View>
                     ))}
                     <TouchableOpacity
@@ -1603,7 +1569,7 @@ const styles = StyleSheet.create({
   },
   vsSeparator: {
     fontSize: 24,
-    fontWeight: '950',
+    fontWeight: '900',
     color: '#EE3224',
     marginHorizontal: 12,
   },
@@ -1832,7 +1798,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 16,
-    fontWeight: '950',
+    fontWeight: '900',
     alignSelf: 'center',
     marginBottom: 15,
   },
@@ -1922,8 +1888,20 @@ const styles = StyleSheet.create({
   integratedExpenseRow: {
     borderWidth: 1,
     borderRadius: 10,
-    padding: 14,
-    gap: 10,
+    padding: 10,
+    gap: 8,
+  },
+  integratedExpenseRowLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    width: '100%',
+  },
+  integratedExpenseDeleteBtn: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rowLabelText: {
     fontSize: 13,
@@ -1951,5 +1929,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 18,
+  },
+  pickerDayCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

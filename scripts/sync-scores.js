@@ -48,8 +48,8 @@ const NAME_MAP = {
   'daegu': '대구 FC',
   'seongnam': '성남 FC',
   'hwaseong': '화성 FC',
-  'paju citizen': '파주 시민 축구단',
-  'yongin city': '용인 시민 축구단',
+  'paju citizen': '파주 프런티어 FC',
+  'yongin city': '용인 FC',
   'cheongju': '충북 청주 FC',
   'asan mugunghwa': '충남아산 FC',
   'chungnam asan': '충남아산 FC',
@@ -59,7 +59,7 @@ const NAME_MAP = {
   'gimpo citizen': '김포 FC',
   'cheonan city': '천안 시티 FC',
   'jeonnam dragons': '전남 드래곤즈',
-  'gimhae': '김해시청 축구단',
+  'gimhae': '김해 FC 2008',
 };
 const SORTED_KEYS = Object.keys(NAME_MAP).sort((a, b) => b.length - a.length);
 

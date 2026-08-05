@@ -15,6 +15,7 @@ import { Colors } from '../constants/Colors';
 import { LEAGUE_TEAMS } from '../constants/TeamData';
 import TeamBadge from '../components/TeamBadge';
 import { showAlert } from '../utils/appAlert';
+import { showInterstitialAd } from '../utils/ads';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -61,7 +62,7 @@ export default function ProfileEditScreen({
     setTempSelectedTeam(tempSelectedTeam === teamName ? '' : teamName);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!localNickname.trim()) {
       showAlert('입력 오류', '닉네임을 입력해 주세요!');
       return;
@@ -70,6 +71,9 @@ export default function ProfileEditScreen({
       showAlert('선택 오류', '응원하는 마이팀을 선택해 주세요.');
       return;
     }
+    // 닉네임이나 마이팀을 실제로 바꿀 때만 전면광고 - 사진만 바꾸는 저장까지 광고를 끼우면 과함
+    const changedIdentity = localNickname.trim() !== (nickname || '') || tempSelectedTeam !== (myTeam || '');
+    if (changedIdentity) await showInterstitialAd();
     onSave({
       nickname: localNickname.trim(),
       avatar: avatarUri,

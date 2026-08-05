@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '950',
+    fontWeight: '900',
     alignSelf: 'center',
     marginBottom: 16,
   },

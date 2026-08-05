@@ -1,14 +1,15 @@
 import React from 'react';
 import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { sectionLabelBase } from '../constants/sharedStyles';
 import { getAchievements } from '../utils/achievements';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function AchievementsScreen({ theme = 'light', logs = [], myTeam, onBack }) {
+export default function AchievementsScreen({ theme = 'light', logs = [], myTeam, goods = [], goodsLogLinks = [], onBack }) {
   const activeColors = Colors[theme];
   const isDark = theme === 'dark';
 
-  const achievements = getAchievements(logs, myTeam);
+  const achievements = getAchievements(logs, myTeam, goods, goodsLogLinks);
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const progressPct = achievements.length > 0 ? (unlockedCount / achievements.length) * 100 : 0;
   const unlocked = achievements.filter((a) => a.unlocked);
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     color: '#ffffff',
     fontSize: 24,
-    fontWeight: '950',
+    fontWeight: '900',
     marginBottom: 12,
   },
   progressTrack: {
@@ -123,8 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBC02D',
   },
   sectionLabel: {
-    fontSize: 11.5,
-    fontWeight: '800',
+    ...sectionLabelBase,
     marginBottom: 8,
     marginLeft: 2,
   },
