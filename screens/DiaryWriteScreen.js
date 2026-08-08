@@ -5,7 +5,6 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   TextInput,
   Modal,
   Dimensions,
@@ -13,6 +12,7 @@ import {
   Animated,
   Switch,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { LEAGUE_TEAMS, TEAM_STADIUMS } from '../constants/TeamData';
 import { Colors } from '../constants/Colors';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
 import { calculateOutcome } from '../utils/achievements';
 import { getRefereeStatus } from '../utils/refereeStatus';

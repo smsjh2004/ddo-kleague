@@ -84,6 +84,17 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 android {
     ndkVersion rootProject.ext.ndkVersion
 
+    // Windows local builds only: the New Architecture's generated C++ paths run
+    // past Windows' 260-character limit, and the ninja bundled with the default
+    // CMake 3.22.1 (1.10.2) refuses them outright. 3.31.6 ships ninja 1.12.1,
+    // which honours the long-path support enabled on this machine. Linux CI has
+    // no such limit and is unaffected either way.
+    externalNativeBuild {
+        cmake {
+            version '3.31.6'
+        }
+    }
+
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 

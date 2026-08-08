@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { sectionLabelBase } from '../constants/sharedStyles';
 import { listFriendDiaryLogs } from '../utils/api';

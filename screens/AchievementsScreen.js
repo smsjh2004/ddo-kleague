@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { sectionLabelBase } from '../constants/sharedStyles';
 import { getAchievements } from '../utils/achievements';

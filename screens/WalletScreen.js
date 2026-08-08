@@ -5,13 +5,13 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   TextInput,
   Modal,
   Dimensions,
   Animated,
   PanResponder,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { Colors } from '../constants/Colors';
 import { getTodayString } from '../utils/date';
@@ -19,6 +19,7 @@ import { formatWon, formatWonShort } from '../utils/format';
 import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
 import { showAlert } from '../utils/appAlert';
 import AdBanner from '../components/AdBanner';
+import KeyboardAwareOverlay from '../components/KeyboardAwareOverlay';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -574,7 +575,7 @@ export default function WalletScreen({
         visible={formVisible}
         onRequestClose={() => setFormVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAwareOverlay style={styles.modalOverlay}>
           <Animated.View style={[styles.modalSheet, { backgroundColor: activeColors.bgApp, transform: [{ translateY: expenseTranslateY }] }]}>
             <View style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: 14, paddingBottom: 10, alignItems: 'center', justifyContent: 'center', zIndex: 10 }} {...expensePanResponder.panHandlers}>
               <View style={[styles.modalHeaderDrag, { marginBottom: 0 }]} />
@@ -735,7 +736,7 @@ export default function WalletScreen({
             </View>
 
           </Animated.View>
-        </View>
+        </KeyboardAwareOverlay>
       </Modal>
 
     </SafeAreaView>

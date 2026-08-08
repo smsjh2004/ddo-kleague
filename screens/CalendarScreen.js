@@ -5,13 +5,13 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   Modal,
   Dimensions,
   Animated,
   PanResponder,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MOCK_SCHEDULE from '../constants/schedule.json';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';

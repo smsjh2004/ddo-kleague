@@ -4,12 +4,12 @@ import {
   Text,
   View,
   ScrollView,
-  SafeAreaView,
   Dimensions,
   Modal,
   TouchableOpacity,
   Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
 import TeamBadge from '../components/TeamBadge';
 import { LEAGUE_TEAMS } from '../constants/TeamData';

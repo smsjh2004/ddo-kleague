@@ -4,9 +4,9 @@ import {
   Text,
   View,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
 import { signInWithKakao } from '../utils/auth';
 import { showAlert } from '../utils/appAlert';

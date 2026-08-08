@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '../constants/Colors';
+import KeyboardAwareOverlay from '../components/KeyboardAwareOverlay';
 import { showAlert } from '../utils/appAlert';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -83,7 +84,7 @@ export default function GoodsModal({
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <View style={styles.overlay}>
+      <KeyboardAwareOverlay style={styles.overlay}>
         <View style={[styles.sheet, { backgroundColor: activeColors.bgApp }]}>
           <ScrollView contentContainerStyle={{ paddingBottom: 20 }} keyboardShouldPersistTaps="handled">
             <Text style={[styles.title, { color: activeColors.brandNavy }]}>
@@ -141,7 +142,7 @@ export default function GoodsModal({
             </View>
           </ScrollView>
         </View>
-      </View>
+      </KeyboardAwareOverlay>
     </Modal>
   );
 }

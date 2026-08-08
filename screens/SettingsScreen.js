@@ -4,10 +4,10 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   Linking,
   StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
 import { TEAM_COLORS } from '../constants/TeamData';
 import { sectionLabelBase } from '../constants/sharedStyles';

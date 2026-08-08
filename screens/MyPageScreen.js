@@ -6,9 +6,9 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/Colors';
 import { storage } from '../utils/storage';
 import { getBingoGrid, getStampedStadiumKeys } from '../constants/stadiumBingo';

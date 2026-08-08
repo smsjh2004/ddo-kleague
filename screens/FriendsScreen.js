@@ -6,12 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StyleSheet,
   ActivityIndicator,
   Share,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Linking from 'expo-linking';
 import * as Clipboard from 'expo-clipboard';
 import { Colors } from '../constants/Colors';
