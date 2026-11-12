@@ -7,7 +7,6 @@ import {
   ScrollView,
   SafeAreaView,
   Image,
-  Dimensions,
   StyleSheet,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,8 +16,6 @@ import TeamBadge from '../components/TeamBadge';
 import { showAlert } from '../utils/appAlert';
 import { showInterstitialAd } from '../utils/ads';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
 
 export default function ProfileEditScreen({
   theme = 'light',
@@ -280,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   teamCard: {
-    width: (width - 48) / 3,
+    width: '31%',
     borderWidth: 1.5,
     borderRadius: 8,
     paddingVertical: 10,

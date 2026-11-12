@@ -14,13 +14,14 @@ import {
 } from 'react-native';
 import MOCK_SCHEDULE from '../constants/schedule.json';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import TeamBadge from '../components/TeamBadge';
 import { getTodayString, buildMonthGrid } from '../utils/date';
 import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
 import AdBanner from '../components/AdBanner';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const DIVISION_OPTIONS = [
   { key: 'all', label: '전체' },
@@ -862,6 +863,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   filterSheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
@@ -883,7 +885,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   teamCard: {
-    width: (width - 56) / 3,
+    width: '31%',
     borderWidth: 1.5,
     borderRadius: 8,
     paddingVertical: 10,
@@ -1141,6 +1143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,

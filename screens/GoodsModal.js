@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import { showAlert } from '../utils/appAlert';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -153,6 +154,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,

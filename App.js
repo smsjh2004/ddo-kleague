@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,16 +6,13 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ActivityIndicator,
   Image,
   useColorScheme,
   Linking,
 } from 'react-native';
 import { storage } from './utils/storage';
 import {
-  supabase,
-  getProfile,
-  upsertProfile,
+  saveProfileForSession,
   deleteProfileRemote,
   deleteAccountRemote,
   upsertDiaryLog,
@@ -32,13 +29,17 @@ import {
   setLogGoodsLinks,
   listFriends,
 } from './utils/api';
-import { signOut, consumeAuthCallbackUrl } from './utils/auth';
+import { withTimeout } from './utils/async';
+import { showAlert } from './utils/appAlert';
+import useAuthSession from './hooks/useAuthSession';
 import { getAchievements } from './utils/achievements';
 import { showAchievementUnlock } from './utils/achievementAlert';
 import { initAds } from './utils/ads';
 import AdBanner from './components/AdBanner';
 import { Colors, applyAccentColor } from './constants/Colors';
+import { webContentWidth } from './constants/sharedStyles';
 import LoginScreen from './screens/LoginScreen';
+import LoadingScreen from './screens/LoadingScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import TutorialScreen from './screens/TutorialScreen';
 import CalendarScreen from './screens/CalendarScreen';
@@ -52,9 +53,16 @@ import AchievementModal from './components/AchievementModal';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [nickname, setNickname] = useState('');
-  const [myTeam, setMyTeam] = useState('');
+  const auth = useAuthSession();
+  const { session, profile } = auth;
+  const nickname = profile?.nickname || '';
+  const myTeam = profile?.my_team || '';
+  const avatarUrl = profile?.avatar_url || '';
+  const hasProfile = !!profile;
+  const [isLoading, setIsLoading] = useState(false);
+  const [configReady, setConfigReady] = useState(false);
+  const [configError, setConfigError] = useState(null);
+  const [configAttempt, setConfigAttempt] = useState(0);
   const [themeMode, setThemeModeState] = useState('system'); // system, light, dark
   const [customAccent, setCustomAccentState] = useState('');
   const [isPremium, setIsPremiumState] = useState(false);
@@ -68,14 +76,12 @@ export default function App() {
   const [focusedLogId, setFocusedLogId] = useState(null);
   const [editingLog, setEditingLog] = useState(null);
   const [schedule, setSchedule] = useState([]);
-  const [session, setSession] = useState(null);
-  const [hasProfile, setHasProfile] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState('');
   const [goods, setGoods] = useState([]);
   const [goodsLogLinks, setGoodsLogLinksState] = useState([]);
   const [friends, setFriends] = useState([]);
   const [pendingFriendCode, setPendingFriendCode] = useState(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const dataRevision = useRef(0);
 
   const systemScheme = useColorScheme();
   const theme = themeMode === 'system' ? (systemScheme || 'light') : themeMode;
@@ -84,41 +90,6 @@ export default function App() {
   const activeTabColor = isDark ? activeColors.brandRed : activeColors.brandNavy;
   const isAdFree = isPremium || adFreeUntil > Date.now();
 
-  // Look up the profile row for a logged-in Kakao user (null if they haven't
-  // finished onboarding yet).
-  const loadProfile = async (userId) => {
-    const profile = await getProfile(userId);
-    if (profile) {
-      setHasProfile(true);
-      setNickname(profile.nickname || '');
-      setMyTeam(profile.my_team || '');
-      setAvatarUrl(profile.avatar_url || '');
-    } else {
-      setHasProfile(false);
-    }
-
-    const [goodsList, goodsLinks, friendRows, logsList, expensesList] = await Promise.all([
-      listGoods(userId),
-      listGoodsLogLinks(userId),
-      listFriends(userId),
-      listDiaryLogs(userId),
-      listExpenses(userId),
-    ]);
-    setGoods(goodsList || []);
-    setGoodsLogLinksState(goodsLinks || []);
-    setFriends((friendRows || []).map((r) => (r.requester_id === userId ? r.addressee : r.requester)).filter(Boolean));
-    // null means the fetch failed/offline - keep whatever's cached locally
-    // rather than wiping the screen; a successful fetch is the source of truth.
-    if (logsList) {
-      setLogs(logsList);
-      storage.setItem('kleague_logs', logsList);
-    }
-    if (expensesList) {
-      setExpenses(expensesList);
-      storage.setItem('kleague_expenses', expensesList);
-    }
-  };
-
   // Kakao's profile photo shows up under different keys depending on how
   // Supabase normalizes it - check the common ones.
   const getKakaoAvatarUrl = (currentSession) => {
@@ -126,71 +97,81 @@ export default function App() {
     return metadata.avatar_url || metadata.picture || '';
   };
 
-  // Load local cache + current Supabase Auth session on launch
+  // Preferences are independent of authentication and have their own deadline.
   useEffect(() => {
+    let cancelled = false;
+    setConfigReady(false);
+    setConfigError(null);
     async function loadConfig() {
       try {
-        const savedThemeMode = await storage.getItem('kleague_theme_mode', 'system');
-        const savedAccent = await storage.getItem('kleague_custom_accent', '');
-        const savedIsPremium = await storage.getItem('kleague_is_premium', false);
-        const savedAdFreeUntil = await storage.getItem('kleague_adfree_until', 0);
-        const savedLogs = await storage.getItem('kleague_logs', []);
-        const savedExpenses = await storage.getItem('kleague_expenses', []);
-
-        // Static schedule data only - no auto score-fetching (client or
-        // server-side), by explicit decision. Cache wins if present so any
-        // manual edits persist across restarts; otherwise falls back to the
-        // bundled schedule.json.
-        const cachedSchedule = await storage.getItem('kleague_schedule_cache', null);
-        if (cachedSchedule) {
-          setSchedule(cachedSchedule);
-        } else {
-          const initialSchedule = require('./constants/schedule.json');
-          setSchedule(initialSchedule);
-        }
-
-        setThemeModeState(savedThemeMode);
-        setCustomAccentState(savedAccent);
-        applyAccentColor(savedAccent);
-        setIsPremiumState(savedIsPremium || false);
-        setAdFreeUntilState(savedAdFreeUntil || 0);
-        setLogs(savedLogs);
-        setExpenses(savedExpenses);
-        initAds();
-
-        if (supabase) {
-          const { data: { session: currentSession } } = await supabase.auth.getSession();
-          setSession(currentSession);
-          if (currentSession) {
-            await loadProfile(currentSession.user.id);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load storage config:', err);
-      } finally {
-        setIsLoading(false);
+        const [savedThemeMode, savedAccent, savedIsPremium, savedAdFreeUntil, cachedSchedule] = await withTimeout(Promise.all([
+          storage.getItem('kleague_theme_mode', 'system'),
+          storage.getItem('kleague_custom_accent', ''),
+          storage.getItem('kleague_is_premium', false),
+          storage.getItem('kleague_adfree_until', 0),
+          storage.getItem('kleague_schedule_cache', null),
+        ]), 5000);
+        if (cancelled) return;
+        setThemeModeState(['system', 'light', 'dark'].includes(savedThemeMode) ? savedThemeMode : 'system');
+        const accent = typeof savedAccent === 'string' ? savedAccent : '';
+        setCustomAccentState(accent);
+        applyAccentColor(accent);
+        setIsPremiumState(savedIsPremium === true);
+        setAdFreeUntilState(Number(savedAdFreeUntil) || 0);
+        // Keep the existing static/manual schedule policy.
+        setSchedule(Array.isArray(cachedSchedule) ? cachedSchedule : require('./constants/schedule.json'));
+        setConfigReady(true);
+      } catch (error) {
+        if (!cancelled) setConfigError(error);
       }
     }
-    loadConfig();
+    void loadConfig();
+    return () => { cancelled = true; };
+  }, [configAttempt]);
 
-    if (supabase) {
-      const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-        setSession(newSession);
-        if (newSession) {
-          loadProfile(newSession.user.id);
-        } else {
-          setHasProfile(false);
-          setNickname('');
-          setMyTeam('');
-          setAvatarUrl('');
-          setGoods([]);
-          setGoodsLogLinksState([]);
-          setFriends([]);
-        }
-      });
-      return () => authListener.subscription.unsubscribe();
-    }
+  useEffect(() => {
+    Promise.resolve().then(initAds).catch(() => {});
   }, []);
+
+  // User content is not part of the login gate. Failed reads retain that user's
+  // cache; an account switch invalidates every late result from the old user.
+  const readyUserId = auth.status === 'ready' && hasProfile ? session?.user.id : null;
+  useEffect(() => {
+    let cancelled = false;
+    const revision = ++dataRevision.current;
+    setLogs([]);
+    setExpenses([]);
+    setGoods([]);
+    setGoodsLogLinksState([]);
+    setFriends([]);
+    setIsWriting(false);
+    setEditingLog(null);
+    setFocusedLogId(null);
+    setWriteAutofill(null);
+    if (!readyUserId) return;
+    async function hydrate() {
+      const [cachedLogs, cachedExpenses] = await withTimeout(Promise.all([
+        storage.getItem(`kleague_logs:${readyUserId}`, []),
+        storage.getItem(`kleague_expenses:${readyUserId}`, []),
+      ]), 5000).catch(() => [[], []]);
+      if (cancelled || dataRevision.current !== revision) return;
+      setLogs(Array.isArray(cachedLogs) ? cachedLogs : []);
+      setExpenses(Array.isArray(cachedExpenses) ? cachedExpenses : []);
+      const reads = [
+        [listDiaryLogs, (value) => { setLogs(value); void storage.setItem(`kleague_logs:${readyUserId}`, value); }],
+        [listExpenses, (value) => { setExpenses(value); void storage.setItem(`kleague_expenses:${readyUserId}`, value); }],
+        [listGoods, setGoods],
+        [listGoodsLogLinks, setGoodsLogLinksState],
+        [listFriends, (rows) => setFriends(rows.map((r) => r.requester_id === readyUserId ? r.addressee : r.requester).filter(Boolean))],
+      ];
+      await Promise.all(reads.map(async ([read, apply]) => {
+        const value = await withTimeout(read(readyUserId)).catch(() => null);
+        if (!cancelled && dataRevision.current === revision && value !== null) apply(value);
+      }));
+    }
+    void hydrate();
+    return () => { cancelled = true; };
+  }, [readyUserId]);
 
   // Autofill redirect effect
   useEffect(() => {
@@ -198,21 +179,6 @@ export default function App() {
       setIsWriting(true);
     }
   }, [writeAutofill, activeTab]);
-
-  // OAuth callback deep link. signInWithKakao() normally consumes this itself,
-  // but "카카오톡으로 로그인" leaves through the KakaoTalk app, and Android is
-  // free to kill us while we sit in the background - the redirect then cold
-  // starts the app, with no pending sign-in call left to receive the tokens.
-  // Handling it here means the session lands no matter which path ran, and
-  // onAuthStateChange picks it up from there.
-  useEffect(() => {
-    const handleAuthUrl = (url) => {
-      consumeAuthCallbackUrl(url).catch(() => {});
-    };
-    Linking.getInitialURL().then(handleAuthUrl).catch(() => {});
-    const sub = Linking.addEventListener('url', ({ url }) => handleAuthUrl(url));
-    return () => sub.remove();
-  }, []);
 
   // Friend invite deep link: kleaguediary://friend/CODE (native) or
   // ?friend=CODE (web). Jumps to My Page and hands the code down so the
@@ -232,26 +198,22 @@ export default function App() {
   }, []);
 
   const handleOnboardingComplete = async (selections) => {
+    if (!session) return;
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      setNickname(selections.nickname);
-      setMyTeam(selections.myTeam);
-
-      if (session) {
-        const chosenAvatarUrl = selections.avatar || getKakaoAvatarUrl(session);
-        await upsertProfile(session.user.id, { ...selections, avatarUrl: chosenAvatarUrl });
-        setAvatarUrl(chosenAvatarUrl);
-        setHasProfile(true);
-        setShowTutorial(true);
-      }
-    } catch (err) {
-      console.error('Failed to save onboarding data:', err);
+      const chosenAvatarUrl = selections.avatar || getKakaoAvatarUrl(session);
+      const savedProfile = await withTimeout(saveProfileForSession(session.user.id, { ...selections, avatarUrl: chosenAvatarUrl }));
+      auth.updateProfile(savedProfile);
+      setShowTutorial(true);
+    } catch {
+      showAlert('프로필 저장 실패', '프로필을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSaveLog = async (newLog, integratedExpenses = [], selectedGoodsIds = []) => {
+    dataRevision.current++;
     const exists = logs.some((l) => l.id === newLog.id);
     let nextLogs;
     if (exists) {
@@ -266,7 +228,7 @@ export default function App() {
     const newlyUnlocked = getAchievements(nextLogs, myTeam, goods, goodsLogLinks).filter((a) => a.unlocked && !prevUnlocked.has(a.id));
 
     setLogs(nextLogs);
-    await storage.setItem('kleague_logs', nextLogs);
+    await storage.setItem(`kleague_logs:${session.user.id}`, nextLogs);
 
     const removedExpenseIds = expenses
       .filter((e) => e.matchId === newLog.id && !integratedExpenses.some((ie) => ie.id === e.id))
@@ -274,7 +236,7 @@ export default function App() {
     const cleanExpenses = expenses.filter((e) => e.matchId !== newLog.id);
     const nextExpenses = [...integratedExpenses, ...cleanExpenses];
     setExpenses(nextExpenses);
-    await storage.setItem('kleague_expenses', nextExpenses);
+    await storage.setItem(`kleague_expenses:${session.user.id}`, nextExpenses);
 
     const nextGoodsLinks = [
       ...goodsLogLinks.filter((l) => l.diary_log_id !== newLog.id),
@@ -297,13 +259,14 @@ export default function App() {
   };
 
   const handleDeleteLog = async (logId) => {
+    dataRevision.current++;
     const nextLogs = logs.filter((l) => l.id !== logId);
     setLogs(nextLogs);
-    await storage.setItem('kleague_logs', nextLogs);
+    await storage.setItem(`kleague_logs:${session.user.id}`, nextLogs);
     // Also clean up any expenses associated with this log
     const nextExpenses = expenses.filter((e) => e.matchId !== logId);
     setExpenses(nextExpenses);
-    await storage.setItem('kleague_expenses', nextExpenses);
+    await storage.setItem(`kleague_expenses:${session.user.id}`, nextExpenses);
 
     if (session) {
       // Deleting the diary_logs row cascades to its expenses server-side (see supabase/schema.sql)
@@ -312,6 +275,7 @@ export default function App() {
   };
 
   const handleSaveExpense = async (savedExpense) => {
+    dataRevision.current++;
     let nextExpenses;
     const exists = expenses.find((e) => e.id === savedExpense.id);
     if (exists) {
@@ -320,7 +284,7 @@ export default function App() {
       nextExpenses = [savedExpense, ...expenses];
     }
     setExpenses(nextExpenses);
-    await storage.setItem('kleague_expenses', nextExpenses);
+    await storage.setItem(`kleague_expenses:${session.user.id}`, nextExpenses);
 
     if (session) {
       upsertExpense(session.user.id, savedExpense);
@@ -328,9 +292,10 @@ export default function App() {
   };
 
   const handleDeleteExpense = async (expenseId) => {
+    dataRevision.current++;
     const nextExpenses = expenses.filter((e) => e.id !== expenseId);
     setExpenses(nextExpenses);
-    await storage.setItem('kleague_expenses', nextExpenses);
+    await storage.setItem(`kleague_expenses:${session.user.id}`, nextExpenses);
 
     if (session) {
       deleteExpenseRemote(session.user.id, expenseId);
@@ -338,12 +303,12 @@ export default function App() {
   };
 
   const handleSaveSettings = async (selections) => {
-    setNickname(selections.nickname);
-    setMyTeam(selections.myTeam);
-    setAvatarUrl(selections.avatar || '');
-
-    if (session) {
-      await upsertProfile(session.user.id, { ...selections, avatarUrl: selections.avatar });
+    if (!session) return;
+    try {
+      const savedProfile = await withTimeout(saveProfileForSession(session.user.id, { ...selections, avatarUrl: selections.avatar }));
+      auth.updateProfile(savedProfile);
+    } catch {
+      showAlert('프로필 저장 실패', '프로필을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 
@@ -351,6 +316,7 @@ export default function App() {
   // goods item leaves its match links untouched, since those are now only
   // managed from the diary write flow (see handleSaveLog).
   const handleSaveGoodsItem = async (goodsItem, linkedLogIds) => {
+    dataRevision.current++;
     const exists = goods.some((g) => g.id === goodsItem.id);
     const nextGoods = exists
       ? goods.map((g) => (g.id === goodsItem.id ? { ...g, name: goodsItem.name, category: goodsItem.category, photo_url: goodsItem.photoUrl } : g))
@@ -374,6 +340,7 @@ export default function App() {
   };
 
   const handleDeleteGoodsItem = async (goodsId) => {
+    dataRevision.current++;
     setGoods(goods.filter((g) => g.id !== goodsId));
     setGoodsLogLinksState(goodsLogLinks.filter((l) => l.goods_id !== goodsId));
 
@@ -410,18 +377,8 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    setIsLoading(true);
-    await signOut();
-    await storage.clear();
-    setNickname('');
-    setMyTeam('');
-    setLogs([]);
-    setExpenses([]);
-    setHasProfile(false);
-    setAvatarUrl('');
-    setGoods([]);
-    setGoodsLogLinksState([]);
-    setIsLoading(false);
+    setShowTutorial(false);
+    await auth.reset();
   };
 
   // Full account purge: the delete-account Edge Function removes the
@@ -431,28 +388,29 @@ export default function App() {
   // every piece of user data the client can reach.
   const handleWithdraw = async () => {
     setIsLoading(true);
-    if (session) {
-      const purged = await deleteAccountRemote();
-      if (!purged) await deleteProfileRemote(session.user.id);
+    try {
+      if (session) {
+        const purged = await withTimeout(deleteAccountRemote());
+        if (!purged) await withTimeout(deleteProfileRemote(session.user.id));
+      }
+      setShowTutorial(false);
+      await auth.reset();
+    } catch {
+      showAlert('요청 실패', '요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
     }
-    await signOut();
-    await storage.clear();
-    setNickname('');
-    setMyTeam('');
-    setLogs([]);
-    setExpenses([]);
-    setHasProfile(false);
-    setAvatarUrl('');
-    setGoods([]);
-    setGoodsLogLinksState([]);
-    setIsLoading(false);
   };
 
-  if (isLoading) {
+  if (!configReady || isLoading || ['restoring', 'profile', 'error'].includes(auth.status)) {
     return (
-      <View style={[styles.loadingCenter, { backgroundColor: activeColors.bgBody }]}>
-        <ActivityIndicator size="large" color={activeColors.brandNavy} />
-      </View>
+      <LoadingScreen
+        theme={theme}
+        stage={!configReady ? 'preferences' : isLoading ? 'saving' : auth.status}
+        error={configError || auth.error}
+        onRetry={configError ? () => setConfigAttempt((value) => value + 1) : auth.retry}
+        onReset={configError ? undefined : auth.reset}
+      />
     );
   }
 
@@ -461,7 +419,7 @@ export default function App() {
     return (
       <>
         <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-        <LoginScreen theme={theme} onLoggedIn={() => {}} />
+        <LoginScreen theme={theme} />
         <AppAlertHost theme={theme} />
       </>
     );
@@ -733,12 +691,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    ...webContentWidth,
     flex: 1,
-  },
-  loadingCenter: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   header: {
     height: 56,

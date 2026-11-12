@@ -16,6 +16,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { LEAGUE_TEAMS, TEAM_STADIUMS } from '../constants/TeamData';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import TeamBadge from '../components/TeamBadge';
 import { getRefereeStatus } from '../utils/refereeStatus';
 import { getTodayString, buildMonthGrid } from '../utils/date';
@@ -867,7 +868,7 @@ export default function DiaryWriteScreen({
               animationType="slide"
               onRequestClose={() => setGoodsPickerVisible(false)}
             >
-              <SafeAreaView style={{ flex: 1, backgroundColor: activeColors.bgBody }}>
+              <SafeAreaView style={[webContentWidth, { flex: 1, backgroundColor: activeColors.bgBody }]}>
                 <View style={[styles.goodsPickerHeader, { backgroundColor: activeColors.bgApp, borderBottomColor: activeColors.borderColor }]}>
                   <View style={styles.goodsPickerHeaderBtn} />
                   <Text style={[styles.goodsPickerHeaderTitle, { color: activeColors.brandNavy }]}>굿즈 보관함</Text>
@@ -1783,6 +1784,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,

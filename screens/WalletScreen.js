@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import { getTodayString } from '../utils/date';
 import { formatWon, formatWonShort } from '../utils/format';
 import useSwipeDismissModal from '../hooks/useSwipeDismissModal';
@@ -1037,6 +1038,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,

@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import TeamBadge from '../components/TeamBadge';
 import { LEAGUE_TEAMS } from '../constants/TeamData';
 import { calculateOutcome } from '../utils/achievements';
@@ -687,7 +688,7 @@ export default function DiaryListScreen({
         onRequestClose={() => setSelectedLog(null)}
       >
         <View style={[styles.detailOverlay, { backgroundColor: activeColors.bgBody }]}>
-          <SafeAreaView style={{ flex: 1 }}>
+          <SafeAreaView style={[webContentWidth, { flex: 1 }]}>
             {selectedLog && (
               <View style={{ flex: 1 }}>
                 {/* Header Row */}
@@ -1126,6 +1127,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
+    ...webContentWidth,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,

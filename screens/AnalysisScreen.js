@@ -11,6 +11,7 @@ import {
   Animated,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import TeamBadge from '../components/TeamBadge';
 import { LEAGUE_TEAMS } from '../constants/TeamData';
 import { getTodayString } from '../utils/date';
@@ -1366,6 +1367,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   configModalContent: {
+    ...webContentWidth,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '75%',
@@ -1643,6 +1645,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
+    ...webContentWidth,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     height: '80%',

@@ -5,12 +5,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
 
 const PAGES = [
   {
@@ -66,7 +64,7 @@ export default function TutorialScreen({ theme = 'light', onFinish }) {
   const page = PAGES[pageIndex];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: activeColors.bgBody }}>
+    <SafeAreaView style={[webContentWidth, { flex: 1, backgroundColor: activeColors.bgBody }]}>
       <View style={styles.skipRow}>
         {!isLastPage && (
           <TouchableOpacity onPress={onFinish} activeOpacity={0.7}>
@@ -75,7 +73,7 @@ export default function TutorialScreen({ theme = 'light', onFinish }) {
         )}
       </View>
 
-      <View style={[styles.page, { width, flex: 1, justifyContent: 'center' }]}>
+      <View style={[styles.page, { width: '100%', flex: 1, justifyContent: 'center' }]}>
         <Text style={styles.pageEmoji}>{page.emoji}</Text>
         <Text style={[styles.pageTitle, { color: isDark ? '#ffffff' : activeColors.brandNavy }]}>
           {page.title}

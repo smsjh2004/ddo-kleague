@@ -7,17 +7,15 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Dimensions,
   Image,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { LEAGUE_TEAMS, TEAM_COLORS } from '../constants/TeamData';
 import { Colors } from '../constants/Colors';
+import { webContentWidth } from '../constants/sharedStyles';
 import { showAlert } from '../utils/appAlert';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
 
 // Native color badge preview helper using flex splits
 const TeamBadgePreview = ({ colors }) => {
@@ -327,6 +325,7 @@ export default function OnboardingScreen({ theme = 'light', onComplete, defaultA
 
 const styles = StyleSheet.create({
   safeArea: {
+    ...webContentWidth,
     flex: 1,
   },
   scrollContainer: {
@@ -444,7 +443,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   teamCard: {
-    width: (width - 48) / 3, // 3 Columns configuration
+    width: '31%', // Three columns relative to the content area.
     borderWidth: 1.5,
     borderRadius: 8,
     paddingVertical: 10,

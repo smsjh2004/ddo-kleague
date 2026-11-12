@@ -1,25 +1,5 @@
-import 'react-native-url-polyfill/auto';
-import { Platform } from 'react-native';
-import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../constants/supabaseConfig';
-
-export const supabase =
-  SUPABASE_URL && SUPABASE_ANON_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          // Native has no browser storage or URL to read tokens from - it
-          // persists the session in AsyncStorage and utils/auth.js parses
-          // the redirect URL manually via WebBrowser. Web uses the default
-          // localStorage + auto-detects the session from the URL hash after
-          // the Kakao redirect lands back on the page.
-          storage: Platform.OS === 'web' ? undefined : AsyncStorage,
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: Platform.OS === 'web',
-        },
-      })
-    : null;
+import { supabase } from './supabaseClient';
+export { supabase } from './supabaseClient';
 
 async function safeCall(label, fn) {
   if (!supabase) {
@@ -43,6 +23,24 @@ export async function getProfile(userId) {
   return safeCall('프로필 조회', () =>
     supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
   );
+}
+
+// Startup must distinguish a missing row from a failed/offline request.
+export async function getProfileForSession(userId, signal) {
+  if (!supabase) throw new Error('로그인 서버에 연결할 수 없습니다.');
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle().abortSignal(signal);
+  if (error) throw error;
+  return data;
+}
+
+export async function saveProfileForSession(userId, { nickname, myTeam, avatarUrl }) {
+  if (!supabase) throw new Error('로그인 서버에 연결할 수 없습니다.');
+  const { data, error } = await supabase.from('profiles').upsert({
+    id: userId, nickname, my_team: myTeam || null, avatar_url: avatarUrl || null,
+    updated_at: new Date().toISOString(),
+  }).select().single();
+  if (error) throw error;
+  return data;
 }
 
 export async function deleteProfileRemote(userId) {
